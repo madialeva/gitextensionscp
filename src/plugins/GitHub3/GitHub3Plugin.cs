@@ -116,13 +116,8 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
     {
         yield return PersonalAccessToken;
 
-        LinkLabel generateTokenLink = new() { Text = _generateToken.Text };
-        generateTokenLink.Click += GenerateTokenLink_Click;
-        yield return new PseudoSetting(generateTokenLink);
-
-        LinkLabel manageTokenLink = new() { Text = _manageToken.Text };
-        manageTokenLink.Click += ManageTokenLink_Click;
-        yield return new PseudoSetting(manageTokenLink);
+        yield return new LinkSetting(_generateToken.Text, GenerateToken);
+        yield return new LinkSetting(_manageToken.Text, ManageToken);
 
         yield return new PseudoSetting(_noteRestartNeeded.Text);
 
@@ -131,12 +126,12 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
         yield return _issueCommitMessageHelperMaxCount;
     }
 
-    private void GenerateTokenLink_Click(object? sender, EventArgs e)
+    private void GenerateToken()
     {
         OpenLink($"https://{GitHubHost.ValueOrDefault(Instance.Settings)}/settings/tokens/new?description=Token%20for%20GitExtensions&scopes=repo,public_repo");
     }
 
-    private void ManageTokenLink_Click(object? sender, EventArgs e)
+    private void ManageToken()
     {
         OpenLink($"https://{GitHubHost.ValueOrDefault(Instance.Settings)}/settings/tokens");
     }
