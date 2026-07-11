@@ -15,13 +15,19 @@ name: Fork CI
 # -----------------------------------------------------------------------------
 on:
   # Cada push a la rama de trabajo (p. ej. al mergear una PR).
+  # `paths-ignore`: si TODOS los ficheros del push están en las rutas ignoradas
+  # (documentación OpenSpec), no se lanza el run — no hay nada que compilar.
   push:
     branches: [ avalonia/main ]
+    paths-ignore:
+      - 'openspec/**'
   # Cada pull request CUYO DESTINO sea avalonia/main. Se ejecuta sobre el
   # resultado provisional del merge, y se re-ejecuta con cada push a la rama
   # de la PR — así el check verde/rojo de la PR siempre refleja el último estado.
   pull_request:
     branches: [ avalonia/main ]
+    paths-ignore:
+      - 'openspec/**'
   # Botón "Run workflow" en la pestaña Actions, para lanzarlo a mano sobre
   # cualquier rama (útil para probar el propio workflow).
   workflow_dispatch:
