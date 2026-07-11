@@ -11,7 +11,11 @@ public interface IGitPlugin
 
     string? Description { get; }
 
-    Image? Icon { get; }
+    /// <summary>
+    ///  Raw bytes of the plugin icon (a PNG image), or <see langword="null"/> if the plugin has no icon.
+    ///  Kept UI-technology neutral on purpose: each shell materializes it to its native image type.
+    /// </summary>
+    byte[]? IconData { get; }
 
     IGitPluginSettingsContainer? SettingsContainer { get; set; }
 

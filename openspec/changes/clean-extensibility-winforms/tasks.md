@@ -6,10 +6,35 @@
 
 ## 1. Inventario
 
-- [ ] 1.1 Inventariar en `GitUI`, `src/plugins` y tests todos los consumidores de:
+- [x] 1.1 Inventariar en `GitUI`, `src/plugins` y tests todos los consumidores de:
       `IWin32Window` de la API, `IGitPlugin.Icon`/`GitPluginBase.Icon`, `CustomControl`,
       `CreateControlBinding`, `MessageBoxes` y `ShowModelessForm`; anotar recuentos y casos
       no mecánicos como notas en este fichero
+
+      **Notas del inventario (2026-07-11):**
+      - `IWin32Window`: 272 usos en 40 ficheros de `src/` (90 en `GitUICommands.cs`, 83 en
+        `IGitUICommands.cs`). También en `GitCommands` (ExceptionUtils, GitTagController,
+        OsShellUtil) y `GitExtUtils` (ThemeFix): APIs propias de esos proyectos, **fuera del
+        alcance 0.2** (irán en 0.3/0.4); aquí solo se toca lo que la API de Extensibility
+        arrastre.
+      - Iconos: los 11 PNG originales existen como ficheros (`Resources/IconX.png` en cada
+        plugin); patrón uniforme `Icon = Resources.IconX` (accessor resx). Consumo de la API:
+        `FormBrowse.cs:881` (menú Plugins) y `AddCommitTemplate(..., Image? icon, ...)`
+        (GitHub3, 3 llamadas pasando `Icon`).
+      - Settings: los bindings concretos **ya viven en GitUI** (`SettingControlBindings/`,
+        10 ficheros + `SettingControlBindingsProvider`); en Extensibility solo quedan la
+        abstracción (`ISettingControlBinding`, `SettingControlBinding<,>`), las propiedades
+        `CustomControl` y `CredentialsControl`. `PseudoSetting` es el más acoplado (3 refs).
+      - `MessageBoxes`: hay DOS clases homónimas — `Extensibility.MessageBoxes` y
+        `GitUI.MessageBoxes` (esta con muchos más usos). Decisión: fusionar la de la API en
+        la de GitUI; los usos desde plugins (Gource, GitHub3…) migran a la copia fusionada
+        vía… (ver tarea 5.1; los plugins referencian GitUI? NO → los usos de plugins
+        necesitan alternativa, resolver en 5.1).
+      - `ShowModelessForm`: solo 3 call sites, todos internos de GitUI, ningún plugin →
+        retirada de la interfaz sin migración.
+      - Sin `using System.Windows.Forms/Drawing` explícitos en Extensibility: llegan como
+        **global usings implícitos** de `UseWindowsForms=true`; el guardarraíl 6.1 los
+        elimina y hará visible cualquier resto.
 
 ## 2. Capa iconos
 

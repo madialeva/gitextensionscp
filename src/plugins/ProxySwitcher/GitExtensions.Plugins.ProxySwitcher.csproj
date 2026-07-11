@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\app\GitCommands\GitCommands.csproj">
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconProxySwitcher.png" />
+    <EmbeddedResource Include="Resources\IconProxySwitcher.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -14,7 +14,7 @@ public class GitImpactPlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("F1ACFE42-6A5E-4C30-AC10-9A7C4BB8B480");
         Name = "Impact Graph";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconGitImpact;
+        SetIconFromEmbeddedPng("IconGitImpact.png");
     }
 
     #region IGitPlugin Members

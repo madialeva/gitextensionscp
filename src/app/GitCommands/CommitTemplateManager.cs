@@ -28,7 +28,7 @@ public interface ICommitTemplateManager
     /// </summary>
     /// <param name="templateName">The name of the template.</param>
     /// <param name="templateText">The body of the template.</param>
-    void Register(string templateName, Func<string> templateText, Image? icon, bool isRegex);
+    void Register(string templateName, Func<string> templateText, byte[]? iconData, bool isRegex);
 
     /// <summary>
     /// Allows a plugin to unregister a commit template.
@@ -44,14 +44,14 @@ public sealed class CommitTemplateManager : ICommitTemplateManager
         public readonly string Name;
 
         public readonly Func<string> Text;
-        public readonly Image? Icon;
+        public readonly byte[]? IconData;
         public readonly bool IsRegex;
 
-        public RegisteredCommitTemplateItem(string name, Func<string> text, Image? icon, bool isRegex)
+        public RegisteredCommitTemplateItem(string name, Func<string> text, byte[]? iconData, bool isRegex)
         {
             Name = name;
             Text = text;
-            Icon = icon;
+            IconData = iconData;
             IsRegex = isRegex;
         }
     }
@@ -83,7 +83,7 @@ public sealed class CommitTemplateManager : ICommitTemplateManager
         {
             lock (_registeredTemplatesStorageSync)
             {
-                return _registeredTemplatesStorage.Select(item => new CommitTemplateItem(item.Name, item.Text(), item.Icon, item.IsRegex)).AsReadOnlyList();
+                return _registeredTemplatesStorage.Select(item => new CommitTemplateItem(item.Name, item.Text(), item.IconData, item.IsRegex)).AsReadOnlyList();
             }
         }
     }
@@ -121,13 +121,13 @@ public sealed class CommitTemplateManager : ICommitTemplateManager
     /// </summary>
     /// <param name="templateName">The name of the template.</param>
     /// <param name="templateText">The body of the template.</param>
-    public void Register(string templateName, Func<string> templateText, Image? icon, bool isRegex = false)
+    public void Register(string templateName, Func<string> templateText, byte[]? iconData, bool isRegex = false)
     {
         lock (_registeredTemplatesStorageSync)
         {
             if (_registeredTemplatesStorage.All(item => item.Name != templateName))
             {
-                _registeredTemplatesStorage.Add(new RegisteredCommitTemplateItem(templateName, templateText, icon, isRegex));
+                _registeredTemplatesStorage.Add(new RegisteredCommitTemplateItem(templateName, templateText, iconData, isRegex));
             }
         }
     }

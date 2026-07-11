@@ -6,14 +6,16 @@ public sealed class CommitTemplateItem
 {
     public string Name { get; set; }
     public string Text { get; set; }
-    public Image? Icon { get; set; }
+
+    /// <summary>Raw bytes of a PNG image, or <see langword="null"/> (UI-technology neutral).</summary>
+    public byte[]? IconData { get; set; }
     public bool IsRegex { get; set; }
 
-    public CommitTemplateItem(string name, string text, Image? icon, bool isRegex)
+    public CommitTemplateItem(string name, string text, byte[]? iconData, bool isRegex)
     {
         Name = name;
         Text = text;
-        Icon = icon;
+        IconData = iconData;
         IsRegex = isRegex;
     }
 
@@ -21,7 +23,7 @@ public sealed class CommitTemplateItem
     {
         Name = string.Empty;
         Text = string.Empty;
-        Icon = null;
+        IconData = null;
         IsRegex = false;
     }
 
