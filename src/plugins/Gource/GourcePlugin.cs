@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using System.IO.Compression;
 using System.Net;
 using System.Text.Json;
@@ -46,7 +46,7 @@ public class GourcePlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("F0A6A769-6DCC-4452-9A43-343347015EEC");
         Name = "Gource";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconGource;
+        SetIconFromEmbeddedPng("IconGource.png");
     }
 
     #region IGitPlugin Members

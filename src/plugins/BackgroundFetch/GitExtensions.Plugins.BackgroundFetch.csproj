@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconBackgroundFetch.png" />
+    <EmbeddedResource Include="Resources\IconBackgroundFetch.png" />
   </ItemGroup>
 
   <ItemGroup>

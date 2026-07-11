@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -14,7 +14,7 @@ public class CreateLocalBranchesPlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("BE7BEE10-21B5-489F-9664-957945C203DC");
         Name = "Create local tracking branches";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconCreateLocalBranches;
+        SetIconFromEmbeddedPng("IconCreateLocalBranches.png");
     }
 
     public override bool Execute(GitUIEventArgs args)

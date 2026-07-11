@@ -10,7 +10,28 @@ public abstract class GitPluginBase : IGitPlugin, ITranslate
 
     public string? Description { get; protected set; }
     public string? Name { get; protected set; }
-    public Image? Icon { get; protected set; }
+    public byte[]? IconData { get; protected set; }
+
+    /// <summary>
+    ///  Loads the plugin icon from a PNG file embedded in the plugin assembly
+    ///  (an <c>EmbeddedResource</c> item, e.g. <c>Resources\IconMyPlugin.png</c>).
+    /// </summary>
+    /// <param name="pngFileName">File name of the embedded PNG, e.g. <c>"IconMyPlugin.png"</c>.</param>
+    protected void SetIconFromEmbeddedPng(string pngFileName)
+    {
+        System.Reflection.Assembly assembly = GetType().Assembly;
+        string? resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(name => name.EndsWith($".{pngFileName}", StringComparison.Ordinal));
+        if (resourceName is null)
+        {
+            throw new InvalidOperationException($"Embedded PNG resource '{pngFileName}' not found in {assembly.GetName().Name}.");
+        }
+
+        using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
+        using MemoryStream memory = new();
+        stream.CopyTo(memory);
+        IconData = memory.ToArray();
+    }
 
     protected GitPluginBase(bool hasSettings)
     {
