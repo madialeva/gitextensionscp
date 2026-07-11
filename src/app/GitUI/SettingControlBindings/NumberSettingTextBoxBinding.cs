@@ -1,4 +1,4 @@
-﻿using GitExtensions.Extensibility.Settings;
+using GitExtensions.Extensibility.Settings;
 using GitExtUtils.GitUI.Theming;
 
 namespace GitUI.SettingControlBindings;
@@ -23,7 +23,6 @@ internal class NumberSettingTextBoxBinding<T> : SettingControlBinding<NumberSett
     {
         TextBox textBox = new();
         textBox.TextChanged += OnTextChanged;
-        Setting.CustomControl = textBox;
         return textBox;
     }
 

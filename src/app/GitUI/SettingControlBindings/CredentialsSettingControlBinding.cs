@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using GitExtensions.Extensibility.Settings;
-using GitExtensions.Extensibility.Settings.UserControls;
+using GitUI.SettingControlBindings.UserControls;
 
 namespace GitUI.SettingControlBindings;
 
@@ -13,8 +13,7 @@ internal sealed class CredentialsSettingControlBinding : SettingControlBinding<C
 
     public override CredentialsControl CreateControl()
     {
-        Setting.CustomControl = new CredentialsControl();
-        return Setting.CustomControl;
+        return new CredentialsControl(userNameLabelText: null, passwordLabelText: null);
     }
 
     public override void LoadSetting(SettingsSource settings, CredentialsControl control)

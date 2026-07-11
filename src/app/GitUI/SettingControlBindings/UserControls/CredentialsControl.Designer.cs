@@ -1,4 +1,4 @@
-﻿namespace GitExtensions.Extensibility.Settings.UserControls;
+namespace GitUI.SettingControlBindings.UserControls;
 
 public partial class CredentialsControl
 {
