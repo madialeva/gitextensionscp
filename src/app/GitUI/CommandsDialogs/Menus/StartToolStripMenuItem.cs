@@ -55,7 +55,7 @@ internal partial class StartToolStripMenuItem : ToolStripMenuItemEx
 
     private void CloneToolStripMenuItemClick(object sender, EventArgs e)
     {
-        UICommands.StartCloneDialog(OwnerForm, string.Empty, false, GitModuleChanged);
+        UICommands.StartCloneDialog(OwnerForm.AsApiWindow(), string.Empty, false, GitModuleChanged);
     }
 
     private void ExitToolStripMenuItemClick(object sender, EventArgs e)
@@ -65,7 +65,7 @@ internal partial class StartToolStripMenuItem : ToolStripMenuItemEx
 
     private void InitNewRepositoryToolStripMenuItemClick(object sender, EventArgs e)
     {
-        UICommands.StartInitializeDialog(OwnerForm, gitModuleChanged: GitModuleChanged);
+        UICommands.StartInitializeDialog(OwnerForm.AsApiWindow(), gitModuleChanged: GitModuleChanged);
     }
 
     private void OpenToolStripMenuItemClick(object sender, EventArgs e)

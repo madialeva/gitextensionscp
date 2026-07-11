@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GitExtensions.Extensibility.Git;
 using GitUI.LeftPanel.Interfaces;
 using GitUI.Properties;
@@ -54,7 +54,7 @@ internal sealed class LocalBranchNode : BaseBranchLeafNode, IGitRefActions, ICan
 
     public bool Checkout()
     {
-        return MessageBoxes.ConfirmBranchCheckout(ParentWindow(), FullPath) && UICommands.StartCheckoutBranch(ParentWindow(), branch: FullPath, remote: false);
+        return MessageBoxes.ConfirmBranchCheckout(ParentWindow().AsWinFormsWindow(), FullPath) && UICommands.StartCheckoutBranch(ParentWindow(), branch: FullPath, remote: false);
     }
 
     public bool CreateBranch()

@@ -1,6 +1,7 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using GitCommands.Git;
 using GitCommands.Git.Tag;
+using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
 using NSubstitute;
 
@@ -54,7 +55,7 @@ public class GitTagControllerTest
 
         _fileSystem.File.Exists(Arg.Is<string>(s => s != null)).Returns(true);
 
-        _uiCommands.StartCommandLineProcessDialog(Arg.Any<IWin32Window>(), Arg.Is<IGitCommand>(cmd => cmd.Arguments.StartsWith("tag")))
+        _uiCommands.StartCommandLineProcessDialog(Arg.Any<IWindow>(), Arg.Is<IGitCommand>(cmd => cmd.Arguments.StartsWith("tag")))
             .Returns(uiResult);
 
         _controller.CreateTag(args, CreateTestingWindow()).Should().Be(uiResult);
@@ -66,16 +67,16 @@ public class GitTagControllerTest
     public void PassesCreatedArgsAndWindowToCommands()
     {
         GitCreateTagArgs args = CreateAnnotatedTagArgs();
-        IWin32Window window = CreateTestingWindow();
+        IWindow window = CreateTestingWindow();
 
         _controller.CreateTag(args, window);
 
         _uiCommands.Received(1).StartCommandLineProcessDialog(window, Arg.Is<IGitCommand>(cmd => cmd.Arguments.StartsWith("tag")));
     }
 
-    private static IWin32Window CreateTestingWindow()
+    private static IWindow CreateTestingWindow()
     {
-        return Substitute.For<IWin32Window>();
+        return Substitute.For<IWindow>();
     }
 
     private static GitCreateTagArgs CreateAnnotatedTagArgs()

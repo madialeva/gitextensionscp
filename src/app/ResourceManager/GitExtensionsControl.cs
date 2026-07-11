@@ -1,4 +1,5 @@
-﻿using GitExtUtils;
+﻿using GitExtensions.Extensibility;
+using GitExtUtils;
 using ResourceManager.Hotkey;
 
 namespace ResourceManager;
@@ -8,7 +9,7 @@ namespace ResourceManager;
 /// <summary>
 ///  Provides hotkey plumbing for Git Extensions <see cref="UserControl"/>s.
 /// </summary>
-public class GitExtensionsControl : TranslatedControl
+public class GitExtensionsControl : TranslatedControl, IWindow
 {
     private IReadOnlyList<HotkeyCommand>? _hotkeys;
 

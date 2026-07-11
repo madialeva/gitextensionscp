@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Full.cs" company="NBug Project">
 //   Copyright (c) 2011 - 2013 Teoman Soygul. Licensed under MIT license.
 // </copyright>
@@ -23,7 +23,7 @@ using Report = BugReporter.Info.Report;
 
 namespace BugReporter;
 
-public partial class BugReportForm : Form, ITranslate
+public partial class BugReportForm : Form, ITranslate, IWindow
 {
     private readonly TranslationString _title = new("Error Report");
     private readonly TranslationString _submitGitHubMessage = new(@"Give as much as information as possible please to help the developers solve this issue. Otherwise, your issue ticket may be closed without any follow-up from the developers.
