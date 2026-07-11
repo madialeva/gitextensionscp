@@ -1,18 +1,25 @@
 # continuous-integration Specification
 
 ## Purpose
-TBD - created by archiving change add-fork-ci. Update Purpose after archive.
+Verificación automática del fork en GitHub Actions: cada push/PR a `avalonia/main` ejecuta
+la misma verificación que en local (`eng/Verify.ps1`), sobre máquina limpia. Establecida por
+el change 0.1 (`add-fork-ci`); el change 0.4 añadirá la pata Linux multiplataforma.
 ## Requirements
 ### Requirement: Verificación automática de avalonia/main
 El repositorio SHALL contener un workflow de GitHub Actions (`.github/workflows/fork-ci.yml`)
 que ejecute la verificación en un runner Windows en cada push a `avalonia/main`, en cada pull
 request cuya rama destino sea `avalonia/main`, y bajo demanda mediante disparo manual
-(`workflow_dispatch`).
+(`workflow_dispatch`). Excepción: los pushes/PRs cuyos ficheros estén todos bajo `openspec/`
+(documentación del proceso) SHALL NOT lanzar la verificación — no afectan al código.
 
 #### Scenario: Push a la rama de trabajo
-- **WHEN** se hace push de un commit a `avalonia/main`
+- **WHEN** se hace push de un commit a `avalonia/main` que toca ficheros fuera de `openspec/`
 - **THEN** GitHub Actions arranca un run del workflow y el commit queda marcado con el
   resultado (✓/✗) visible en el historial
+
+#### Scenario: Push solo de documentación OpenSpec
+- **WHEN** se hace push de un commit cuyos ficheros están todos bajo `openspec/`
+- **THEN** el workflow no se ejecuta
 
 #### Scenario: Disparo manual
 - **WHEN** el usuario pulsa "Run workflow" en la pestaña Actions de GitHub
