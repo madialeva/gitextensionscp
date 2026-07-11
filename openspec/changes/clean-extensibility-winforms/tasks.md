@@ -125,5 +125,7 @@
       el guardarraíl activo
 - [ ] 6.2 `eng/Verify.ps1` completo en verde + smoke test manual del escenario de la spec:
       arrancar app → abrir repo → ejecutar un plugin → settings del plugin → editar y guardar
+      → Verify en verde con el guardarraíl activo (build limpio + 15/15 suites, 4:12);
+      pendiente solo el smoke test manual
 - [ ] 6.3 Actualizar la hoja de ruta (0.2 completado) y registrar en el registro de
       decisiones interno las decisiones tomadas durante la implementación
