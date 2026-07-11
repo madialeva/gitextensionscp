@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using Git.hub;
 using GitCommands;
 using GitCommands.Config;
@@ -109,7 +109,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
 
         Instance ??= this;
 
-        Icon = Resources.IconGitHub;
+        SetIconFromEmbeddedPng("IconGitHub.png");
     }
 
     public override IEnumerable<ISetting> GetSettings()
@@ -174,7 +174,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
 
         if (string.IsNullOrEmpty(GitHubLoginInfo.OAuthToken))
         {
-            e.GitUICommands.AddCommitTemplate(_noTokenError.Text, () => string.Empty, Icon);
+            e.GitUICommands.AddCommitTemplate(_noTokenError.Text, () => string.Empty, IconData);
             return;
         }
 
@@ -191,7 +191,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
             if (issues?.All(i => i.Number == 0) ?? true)
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                e.GitUICommands.AddCommitTemplate(_noAssignedIssues.Text, () => string.Empty, Icon);
+                e.GitUICommands.AddCommitTemplate(_noAssignedIssues.Text, () => string.Empty, IconData);
                 return;
             }
 
@@ -206,7 +206,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
                 string remoteData = multipleRemotes ? $" ({issue.Repository.Owner.Login}/{issue.Repository.Name})" : string.Empty;
                 string key = $"{issue.Number}: {issue.Title}{remoteData}";
                 _currentMessages.Add(key);
-                e.GitUICommands.AddCommitTemplate(key, () => GetIssueDescription(issue), Icon);
+                e.GitUICommands.AddCommitTemplate(key, () => GetIssueDescription(issue), IconData);
             }
 
             static string GetIssueDescription(Issue issue)
@@ -341,6 +341,18 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
         }
     }
 
+    private static Image? ToImage(byte[]? iconData)
+    {
+        if (iconData is null || iconData.Length == 0)
+        {
+            return null;
+        }
+
+        using MemoryStream stream = new(iconData);
+        using Image image = Image.FromStream(stream);
+        return new Bitmap(image);
+    }
+
     public void ConfigureContextMenu(ContextMenuStrip contextMenu)
     {
         const string HostedRemoteMenuItem = "HostedRemoteMenuItem";
@@ -360,7 +372,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
             return;
         }
 
-        ToolStripMenuItem toolStripMenuItem = new(string.Format(_viewInWebSite.Text, Name), Icon)
+        ToolStripMenuItem toolStripMenuItem = new(string.Format(_viewInWebSite.Text, Name), ToImage(IconData))
         {
             Tag = HostedRemoteMenuItem
         };

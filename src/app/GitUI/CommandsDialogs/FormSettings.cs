@@ -175,7 +175,7 @@ public sealed partial class FormSettings : GitModuleForm, ISettingsPageHost
 
             foreach ((IGitPlugin plugin, PluginSettingsPage page) entry in pluginEntries)
             {
-                settingsTreeView.AddSettingsPage(entry.page, pluginsPageRef, entry.plugin.Icon as Bitmap);
+                settingsTreeView.AddSettingsPage(entry.page, pluginsPageRef, entry.plugin.IconData.ToImage() as Bitmap);
             }
         }
 

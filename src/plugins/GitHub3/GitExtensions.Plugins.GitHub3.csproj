@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <Compile Include="..\..\app\GitExtUtils\Validates.cs" Link="Validates.cs" />
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconGitHub.png" />
+    <EmbeddedResource Include="Resources\IconGitHub.png" />
   </ItemGroup>
 
   <ItemGroup>

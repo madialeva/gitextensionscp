@@ -2550,7 +2550,7 @@ public sealed partial class FormCommit : GitModuleForm
                     return false;
                 }
 
-                ToolStripMenuItem toolStripItem = new(item.Name, item.Icon);
+                ToolStripMenuItem toolStripItem = new(item.Name, item.IconData.ToImage());
                 toolStripItem.Click += delegate
                 {
                     try
