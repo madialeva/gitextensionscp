@@ -183,7 +183,7 @@ internal sealed class WorktreeTree(TreeNode treeNode, IGitUICommandsSource uiCom
     public void CreateWorktree(IWin32Window owner)
     {
         string? mainWorktreePath = GetMainWorktreePath();
-        if (UICommands.WorktreeCreate(owner, mainWorktreePath))
+        if (UICommands.WorktreeCreate(owner.AsApiWindow(), mainWorktreePath))
         {
             Refresh();
         }
@@ -191,7 +191,7 @@ internal sealed class WorktreeTree(TreeNode treeNode, IGitUICommandsSource uiCom
 
     public void PruneWorktrees(IWin32Window owner)
     {
-        if (UICommands.StartCommandLineProcessDialog(owner, command: null, "worktree prune"))
+        if (UICommands.StartCommandLineProcessDialog(owner.AsApiWindow(), command: null, "worktree prune"))
         {
             UICommands.RepoChangedNotifier.Notify();
         }

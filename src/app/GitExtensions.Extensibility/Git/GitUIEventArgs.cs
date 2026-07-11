@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace GitExtensions.Extensibility.Git;
 
@@ -6,7 +6,7 @@ public class GitUIEventArgs : CancelEventArgs
 {
     private readonly IFilteredGitRefsProvider _getRefs;
 
-    public GitUIEventArgs(IWin32Window? ownerForm, IGitUICommands gitUICommands, Lazy<IReadOnlyList<IGitRef>>? getRefs = null)
+    public GitUIEventArgs(IWindow? ownerForm, IGitUICommands gitUICommands, Lazy<IReadOnlyList<IGitRef>>? getRefs = null)
         : base(cancel: false)
     {
         OwnerForm = ownerForm;
@@ -23,7 +23,7 @@ public class GitUIEventArgs : CancelEventArgs
 
     public IGitUICommands GitUICommands { get; }
 
-    public IWin32Window? OwnerForm { get; }
+    public IWindow? OwnerForm { get; }
 
     public IGitModule GitModule => GitUICommands.Module;
 

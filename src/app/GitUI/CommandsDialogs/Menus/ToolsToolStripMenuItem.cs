@@ -1,4 +1,4 @@
-﻿using GitCommands;
+using GitCommands;
 using GitUI.CommandsDialogs.BrowseDialog;
 using GitUI.Infrastructure;
 using GitUI.Shells;
@@ -72,7 +72,7 @@ internal partial class ToolsToolStripMenuItem : ToolStripMenuItemEx
         string translation = AppSettings.Translation;
         CommitInfoPosition commitInfoPosition = AppSettings.CommitInfoPosition;
 
-        UICommands.StartSettingsDialog(OwnerForm);
+        UICommands.StartSettingsDialog(OwnerForm.AsApiWindow());
 
         SettingsChanged?.Invoke(sender, new(translation, commitInfoPosition));
     }

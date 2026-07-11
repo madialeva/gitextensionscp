@@ -152,14 +152,14 @@ public class MessageBoxes : Translate
     /// </summary>
     /// <returns>The <see cref="DialogResult"/> selected by the user.</returns>
     public static DialogResult Show(IWin32Window? owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
-        => GitExtensions.Extensibility.MessageBoxes.Show(owner, text, caption, buttons, icon, defaultButton);
+        => GitExtensions.Extensibility.MessageBoxes.Show(owner.AsApiWindow(), text, caption, buttons, icon, defaultButton);
 
     /// <summary>
     ///  Shows a message box without specifying an icon.
     /// </summary>
     /// <returns>The <see cref="DialogResult"/> selected by the user.</returns>
     public static DialogResult Show(IWin32Window? owner, string text, string caption, MessageBoxButtons buttons)
-        => GitExtensions.Extensibility.MessageBoxes.Show(owner, text, caption, buttons);
+        => GitExtensions.Extensibility.MessageBoxes.Show(owner.AsApiWindow(), text, caption, buttons);
 
     /// <summary>
     ///  Shows a message box without an explicit owner window.

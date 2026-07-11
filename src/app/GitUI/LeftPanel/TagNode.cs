@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GitExtensions.Extensibility.Git;
 using GitUI.LeftPanel.Interfaces;
 using GitUI.Properties;
@@ -37,17 +37,17 @@ internal sealed class TagNode : BaseRevisionNode, IGitRefActions, ICanDelete
 
     public bool CreateBranch()
     {
-        return UICommands.StartCreateBranchDialog(TreeViewNode.TreeView, ObjectId);
+        return UICommands.StartCreateBranchDialog(TreeViewNode.TreeView.AsApiWindow(), ObjectId);
     }
 
     public bool Delete()
     {
-        return UICommands.StartDeleteTagDialog(TreeViewNode.TreeView, FullPath);
+        return UICommands.StartDeleteTagDialog(ParentWindow(), FullPath);
     }
 
     public bool Merge()
     {
-        return UICommands.StartMergeBranchDialog(TreeViewNode.TreeView, FullPath);
+        return UICommands.StartMergeBranchDialog(ParentWindow(), FullPath);
     }
 
     public override void ApplyStyle()
@@ -62,6 +62,6 @@ internal sealed class TagNode : BaseRevisionNode, IGitRefActions, ICanDelete
 
     public bool Checkout()
     {
-        return UICommands.StartCheckoutRevisionDialog(TreeViewNode.TreeView, FullPath);
+        return UICommands.StartCheckoutRevisionDialog(ParentWindow(), FullPath);
     }
 }

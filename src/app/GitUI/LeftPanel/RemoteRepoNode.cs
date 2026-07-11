@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GitCommands;
 using GitCommands.Remotes;
 using GitExtensions.Extensibility.Git;
@@ -112,7 +112,7 @@ internal sealed class RemoteRepoNode : BaseRevisionNode
     {
         UICommands.StartPullDialogAndPullImmediately(
             out bool pullCompleted,
-            TreeViewNode.TreeView,
+            ParentWindow(),
             remote: FullPath,
             pullAction: GitPullAction.Fetch);
         return pullCompleted;
@@ -122,7 +122,7 @@ internal sealed class RemoteRepoNode : BaseRevisionNode
     {
         UICommands.StartPullDialogAndPullImmediately(
             out bool pullCompleted,
-            TreeViewNode.TreeView,
+            ParentWindow(),
             remote: FullPath,
             pullAction: GitPullAction.FetchPruneAll);
         return pullCompleted;

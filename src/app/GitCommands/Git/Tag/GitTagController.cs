@@ -1,5 +1,6 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using GitCommands.Git.Extensions;
+using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
 
 namespace GitCommands.Git.Tag;
@@ -12,7 +13,7 @@ public interface IGitTagController
     /// <param name="args">tag creation arguments</param>
     /// <param name="parentWindow">the UI window to act as the parent of the create tag dialog</param>
     /// <returns>the true if the tag is created.</returns>
-    bool CreateTag(GitCreateTagArgs args, IWin32Window parentWindow);
+    bool CreateTag(GitCreateTagArgs args, IWindow parentWindow);
 }
 
 public class GitTagController : IGitTagController
@@ -37,7 +38,7 @@ public class GitTagController : IGitTagController
     /// <param name="args">tag creation arguments</param>
     /// <param name="parentWindow">the UI window to act as the parent of the create tag dialog</param>
     /// <returns>the true if the tag is created.</returns>
-    public bool CreateTag(GitCreateTagArgs args, IWin32Window parentWindow)
+    public bool CreateTag(GitCreateTagArgs args, IWindow parentWindow)
     {
         ArgumentNullException.ThrowIfNull(parentWindow);
 

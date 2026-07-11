@@ -1,4 +1,4 @@
-﻿using GitCommands;
+using GitCommands;
 using GitCommands.Git;
 using GitCommands.Remotes;
 using GitExtensions.Extensibility;
@@ -129,14 +129,14 @@ internal sealed class RemoteBranchTree : BaseRefTree
 
     internal void PopupManageRemotesForm(string? remoteName)
     {
-        UICommands.StartRemotesDialog(TreeViewNode.TreeView, remoteName);
+        UICommands.StartRemotesDialog(TreeViewNode.TreeView.AsApiWindow(), remoteName);
     }
 
     internal bool FetchAll()
     {
         UICommands.StartPullDialogAndPullImmediately(
             out bool pullCompleted,
-            TreeViewNode.TreeView,
+            TreeViewNode.TreeView.AsApiWindow(),
             pullAction: GitPullAction.FetchAll);
         return pullCompleted;
     }
@@ -145,7 +145,7 @@ internal sealed class RemoteBranchTree : BaseRefTree
     {
         UICommands.StartPullDialogAndPullImmediately(
             out bool pullCompleted,
-            TreeViewNode.TreeView,
+            TreeViewNode.TreeView.AsApiWindow(),
             pullAction: GitPullAction.FetchPruneAll);
         return pullCompleted;
     }
