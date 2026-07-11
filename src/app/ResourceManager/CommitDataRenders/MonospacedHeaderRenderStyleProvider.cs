@@ -1,5 +1,5 @@
 ﻿using GitCommands;
-using GitExtensions.Extensibility.Extensions;
+using GitExtUtils;
 
 namespace ResourceManager.CommitDataRenders;
 

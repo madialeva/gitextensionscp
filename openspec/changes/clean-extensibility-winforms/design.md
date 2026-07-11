@@ -81,6 +81,9 @@ paralelo (la política es romper, no duplicar).
 - Los plugins que hoy personalizan `CustomControl` se migran a la personalización
   equivalente del lado GitUI (inventario en tarea 4.1; si alguno necesita algo no cubierto,
   se decide en ese momento con el caso concreto delante).
+  **Resultado del inventario**: ningún plugin usaba `CustomControl`; lo que usaban era
+  `PseudoSetting` con controles vivos. Solución: `PseudoSetting` queda como texto declarativo
+  y se añade `LinkSetting` (texto + `Action`) para los enlaces de GitHub3.
 - `CredentialsSetting` (usa AdysTech.CredentialManager) se queda en `Extensibility` como
   dato; su control se va a GitUI como el resto.
 
@@ -90,9 +93,11 @@ renderizado declarativo cuando exista (Fase 2+), y entonces se verá qué necesi
 
 ### D4 — `MessageBoxes` y `ShowModelessForm` salen de la API
 
-- `MessageBoxes` (estático, envuelve `MessageBox.Show`) se muda a `GitUI` tal cual. Los
-  plugins que lo usen pasan a mostrar mensajes vía los servicios que ya reciben (inventario
-  en tarea 5.1).
+- `MessageBoxes` (estático, envuelve `MessageBox.Show`) se muda fuera de la API.
+  **Corrección durante implementación**: el destino es `GitExtUtils`, no `GitUI` — los
+  plugins y `GitCommands` lo consumen y no referencian `GitUI`; `GitExtUtils` es visible
+  para todos y es el candidato natural al ensamblado Windows-only del change 0.3. Sus
+  firmas usan `IWindow` (traduce internamente), así los call sites no cambian.
 - `ShowModelessForm(IWin32Window?, ..., Func<Form> provideForm)` es una factoría de Forms en
   la firma pública: se retira de `IGitUICommands` y se recoloca como mecanismo interno de
   GitUI accesible a los plugins que lo usan (según inventario; hoy se estima uso mínimo).
@@ -103,6 +108,14 @@ renderizado declarativo cuando exista (Fase 2+), y entonces se verá qué necesi
 `<UseWindowsForms>false</UseWindowsForms>` (anulando el `true` global de
 `Directory.Build.props`). A partir de ahí, reintroducir un tipo WinForms en la API **no
 compila**. Es la versión barata del canary del 0.4 y su prueba de fuego anticipada.
+
+**Resultado durante implementación**: cumplió su función — destapó 5 acoplamientos que el
+barrido textual no veía porque los tipos llegaban por los global usings implícitos de
+WinForms: `Font` en `FontParser`/`SettingsSource` (GDI+ → movidos a `GitExtUtils` como
+extensiones), `ContextMenuStrip` en `IRepositoryHostPlugin.ConfigureContextMenu` (retirado;
+GitUI construye el menú de blame con la API neutral existente), `Application` en
+`DebugHelpers` (→ `Environment.ProcessPath`) y los `using System.Drawing;` explícitos que
+faltaban para `Point`/`Color` (System.Drawing.Primitives, multiplataforma, permitidos).
 
 ### D6 — Orden de ejecución por capas, Verify en verde entre capas
 

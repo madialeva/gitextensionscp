@@ -2083,7 +2083,7 @@ public sealed partial class RevisionGridControl : GitModuleControl, ICheckRefs, 
                 return new FormCommitDiff(UICommands, selectedRevisions[0].ObjectId);
             }
 
-            UICommands.ShowModelessForm(ParentForm.AsApiWindow(), false, null, null, ProvideForm);
+            ((GitUICommands)UICommands).ShowModelessForm(ParentForm.AsApiWindow(), false, null, null, ProvideForm);
         }
         else if (!selectedRevisions.Any())
         {

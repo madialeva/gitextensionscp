@@ -4,6 +4,12 @@
     <IsPackable>true</IsPackable>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Guardrail (change 0.2, clean-extensibility-winforms): this assembly is the public,
+         UI-technology-neutral extensibility contract. It must never reference WinForms/GDI+.
+         Overrides the repo-wide UseWindowsForms=true from Directory.Build.props; any WinForms
+         type reintroduced in this project will fail to compile. -->
+    <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>

@@ -38,7 +38,6 @@ public interface IGitUICommands : IServiceProvider
     void RaisePostRegisterPlugin(IWindow? owner);
     void RemoveCommitTemplate(string key);
     bool RunCommand(IReadOnlyList<string> args);
-    void ShowModelessForm(IWindow? owner, bool requiresValidWorkingDir, EventHandler<GitUIEventArgs>? preEvent, EventHandler<GitUIPostActionEventArgs>? postEvent, Func<Form> provideForm);
     bool StartAddFilesDialog(IWindow? owner, string? addFiles = null);
     bool StartAddToGitIgnoreDialog(IWindow? owner, bool localExclude, params string[] filePattern);
     bool StartAmendCommitDialog(IWindow? owner, GitRevision revision);
