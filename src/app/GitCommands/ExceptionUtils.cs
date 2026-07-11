@@ -16,7 +16,7 @@ public static class ExceptionUtils
         ShowException(null, e, info, canIgnore);
     }
 
-    public static void ShowException(IWin32Window? owner, Exception e, string info, bool canIgnore)
+    public static void ShowException(IWindow? owner, Exception e, string info, bool canIgnore)
     {
         if (!(canIgnore && IsIgnorable(e)))
         {

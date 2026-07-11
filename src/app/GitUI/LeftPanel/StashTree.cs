@@ -62,16 +62,16 @@ internal sealed class StashTree : BaseRevisionTree
 
     public void StashAll(IWin32Window owner)
     {
-        UICommands.StashSave(owner, AppSettings.IncludeUntrackedFilesInManualStash);
+        UICommands.StashSave(owner.AsApiWindow(), AppSettings.IncludeUntrackedFilesInManualStash);
     }
 
     public void StashStaged(IWin32Window owner)
     {
-        UICommands.StashStaged(owner);
+        UICommands.StashStaged(owner.AsApiWindow());
     }
 
     public void OpenStash(IWin32Window owner)
     {
-        UICommands.StartStashDialog(owner, manageStashes: true);
+        UICommands.StartStashDialog(owner.AsApiWindow(), manageStashes: true);
     }
 }

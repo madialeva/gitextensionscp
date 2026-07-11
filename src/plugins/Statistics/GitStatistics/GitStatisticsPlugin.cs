@@ -50,7 +50,7 @@ public class GitStatisticsPlugin : GitPluginBase, IGitPluginForRepository
 
         using (formStatistics)
         {
-            formStatistics.ShowDialog(args.OwnerForm);
+            formStatistics.ShowDialog(args.OwnerForm as IWin32Window);
         }
 
         return false;

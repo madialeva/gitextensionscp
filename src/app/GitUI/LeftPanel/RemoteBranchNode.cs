@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
 using GitUI.LeftPanel.Interfaces;
@@ -30,7 +30,7 @@ internal sealed class RemoteBranchNode : BaseBranchLeafNode, IGitRefActions, ICa
         RemoteBranchInfo remoteBranchInfo = GetRemoteBranchInfo();
         UICommands.StartPullDialogAndPullImmediately(
             out bool pullCompleted,
-            TreeViewNode.TreeView,
+            ParentWindow(),
             remoteBranch: remoteBranchInfo.BranchName,
             remote: remoteBranchInfo.Remote,
             pullAction: GitPullAction.Fetch);
@@ -51,23 +51,23 @@ internal sealed class RemoteBranchNode : BaseBranchLeafNode, IGitRefActions, ICa
 
     public bool CreateBranch()
     {
-        return UICommands.StartCreateBranchDialog(TreeViewNode.TreeView, FullPath);
+        return UICommands.StartCreateBranchDialog(ParentWindow(), FullPath);
     }
 
     public bool Delete()
     {
         RemoteBranchInfo remoteBranchInfo = GetRemoteBranchInfo();
-        return UICommands.StartDeleteRemoteBranchDialog(TreeViewNode.TreeView, remoteBranchInfo.Remote + '/' + remoteBranchInfo.BranchName);
+        return UICommands.StartDeleteRemoteBranchDialog(ParentWindow(), remoteBranchInfo.Remote + '/' + remoteBranchInfo.BranchName);
     }
 
     public bool Checkout()
     {
-        return MessageBoxes.ConfirmBranchCheckout(ParentWindow(), FullPath) && UICommands.StartCheckoutRemoteBranch(TreeViewNode.TreeView, FullPath);
+        return MessageBoxes.ConfirmBranchCheckout(ParentWindow().AsWinFormsWindow(), FullPath) && UICommands.StartCheckoutRemoteBranch(ParentWindow(), FullPath);
     }
 
     public bool Merge()
     {
-        return UICommands.StartMergeBranchDialog(TreeViewNode.TreeView, FullPath);
+        return UICommands.StartMergeBranchDialog(ParentWindow(), FullPath);
     }
 
     internal override void OnDoubleClick()
