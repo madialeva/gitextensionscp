@@ -14,6 +14,7 @@ using GitCommands;
 using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Translations;
 using GitExtensions.Extensibility.Translations.Xliff;
+using GitExtUtils;
 using GitExtUtils.GitUI;
 using GitExtUtils.GitUI.Theming;
 using GitUI;

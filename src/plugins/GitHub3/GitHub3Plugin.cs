@@ -8,6 +8,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
 using GitExtensions.Extensibility.Settings;
 using GitExtensions.Plugins.GitHub3.Properties;
+using GitExtUtils;
 using GitUI;
 using GitUIPluginInterfaces;
 using GitUIPluginInterfaces.RepositoryHosts;
@@ -73,7 +74,6 @@ internal static class GitHubLoginInfo
 [Export(typeof(IGitPluginForCommit))]
 public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginForCommit
 {
-    private readonly TranslationString _viewInWebSite = new("View in {0}");
     private readonly TranslationString _tokenAlreadyExist = new("You already have an personal access token. To get a new one, delete your old one in Plugins > Plugin Settings first.");
     private readonly TranslationString _generateToken = new("Generate a GitHub personal access token");
     private readonly TranslationString _manageToken = new("Manage GitHub personal access token");
@@ -98,7 +98,6 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
     internal static GitHubRemoteParser _gitHubRemoteParser = new();
 
     private IGitUICommands? _currentGitUiCommands;
-    private IReadOnlyList<IHostedRemote>? _hostedRemotesForModule;
     private List<string> _currentMessages = [];
 
     public GitHub3Plugin() : base(true)
@@ -333,59 +332,6 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
                     yield return hostedRemote;
                 }
             }
-        }
-    }
-
-    private static Image? ToImage(byte[]? iconData)
-    {
-        if (iconData is null || iconData.Length == 0)
-        {
-            return null;
-        }
-
-        using MemoryStream stream = new(iconData);
-        using Image image = Image.FromStream(stream);
-        return new Bitmap(image);
-    }
-
-    public void ConfigureContextMenu(ContextMenuStrip contextMenu)
-    {
-        const string HostedRemoteMenuItem = "HostedRemoteMenuItem";
-
-        for (int i = contextMenu.Items.Count - 1; i >= 0; i--)
-        {
-            ToolStripItem item = contextMenu.Items[i];
-            if (item is ToolStripMenuItem tsmi && tsmi.Tag as string == HostedRemoteMenuItem)
-            {
-                contextMenu.Items.RemoveAt(i);
-            }
-        }
-
-        _hostedRemotesForModule = GetHostedRemotesForModule();
-        if (_hostedRemotesForModule.Count == 0)
-        {
-            return;
-        }
-
-        ToolStripMenuItem toolStripMenuItem = new(string.Format(_viewInWebSite.Text, Name), ToImage(IconData))
-        {
-            Tag = HostedRemoteMenuItem
-        };
-        contextMenu.Items.Add(toolStripMenuItem);
-
-        foreach (IHostedRemote hostedRemote in _hostedRemotesForModule.OrderBy(r => r.Data))
-        {
-            ToolStripItem toolStripItem = toolStripMenuItem.DropDownItems.Add(hostedRemote.DisplayData);
-            toolStripItem.Click += (s, e) =>
-            {
-                if (contextMenu.Tag is GitBlameContext blameContext)
-                {
-                    OsShellUtil.OpenUrlInDefaultBrowser(hostedRemote.GetBlameUrl(
-                            blameContext.BlameId.ToString(),
-                            blameContext.FileName,
-                            blameContext.LineIndex + 1));
-                }
-            };
         }
     }
 }

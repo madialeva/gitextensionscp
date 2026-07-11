@@ -1,4 +1,6 @@
-﻿namespace GitExtensions.Extensibility;
+using GitExtensions.Extensibility;
+
+namespace GitExtUtils;
 
 /// <summary>
 ///  Provides general-purpose wrappers around <c>System.Windows.Forms.MessageBox</c>

@@ -68,27 +68,61 @@
 
 ## 4. Capa settings
 
-- [ ] 4.1 Confirmar con el inventario qué plugins personalizan `CustomControl` y decidir su
+- [x] 4.1 Confirmar con el inventario qué plugins personalizan `CustomControl` y decidir su
       equivalente en el registro de bindings de GitUI (anotar aquí la decisión por plugin)
-- [ ] 4.2 Dejar `ISetting` y settings concretos como datos puros: eliminar
+      → NINGÚN plugin usa `CustomControl` (solo GitUI: `StringComboBoxAdapter`, que ahora
+      lleva su ComboBox como propiedad propia). Lo que sí usan los plugins: `PseudoSetting`
+      con controles vivos (GitHub3: 2 LinkLabel; BackgroundFetch: texto multilínea) →
+      `PseudoSetting` reescrito como datos (Text/Caption/Height) y nuevo `LinkSetting`
+      (Text + Action) para los enlaces
+- [x] 4.2 Dejar `ISetting` y settings concretos como datos puros: eliminar
       `CreateControlBinding()` y las propiedades `CustomControl`
-- [ ] 4.3 Mover `ISettingControlBinding`, `SettingControlBinding<,>` y `CredentialsControl`
+- [x] 4.3 Mover `ISettingControlBinding`, `SettingControlBinding<,>` y `CredentialsControl`
       (con Designer y resx) a `GitUI`; completar el proveedor de bindings de GitUI como único
       mecanismo de renderizado
+      → namespace `GitUI.SettingControlBindings`; sorpresa: el generador Roslyn del repo
+      crea ctors [Obsolete] sin parámetros — el binding llama al ctor real con argumentos
+      explícitos. Tests de bindings adaptados a inyección por ctor. 15/15 suites verdes
 - [ ] 4.4 Verificar la tubería de traducción del `CredentialsControl` reubicado (el resx debe
       seguir entrando en los `.xlf`) y el escenario de credenciales; `eng/Verify.ps1` en verde
+      → parcial: Verify verde tras la capa; la comprobación de traducción/credenciales se
+      hace con el smoke test 6.2
 
 ## 5. Capa varios y barrido
 
-- [ ] 5.1 Mover `MessageBoxes` a `GitUI`; migrar los usos desde plugins según inventario
-- [ ] 5.2 Retirar `ShowModelessForm(Func<Form>)` de `IGitUICommands` y recolocar el mecanismo
+- [x] 5.1 Mover `MessageBoxes` a `GitUI`; migrar los usos desde plugins según inventario
+      → destino corregido: `GitExtUtils` (GitUI no es visible para plugins ni GitCommands;
+      GitExtUtils lo es para todos y es el candidato al ensamblado Windows-only del 0.3).
+      Firmas ya en `IWindow` desde la capa owners, cero cambios en call sites de plugins
+- [x] 5.2 Retirar `ShowModelessForm(Func<Form>)` de `IGitUICommands` y recolocar el mecanismo
       en GitUI para sus consumidores; barrido final de `using System.Windows.Forms|Drawing`
       en `Extensibility` (debe quedar a cero)
+      → método fuera de la interfaz (queda público en `GitUICommands`; único caller externo,
+      RevisionGridControl, castea). Barrido extra que destapó el guardarraíl:
+      `UIExtensions` (CheckBox) movido a GitExtUtils; `TranslationUtil` convertido a
+      detección de tipos WinForms por reflexión (sin referencia compile-time; la tubería
+      entera se reemplaza en Fase 4); `Color` se queda (System.Drawing.Primitives es
+      multiplataforma)
 
 ## 6. Guardarraíl y cierre
 
-- [ ] 6.1 Fijar `<UseWindowsForms>false</UseWindowsForms>` en
+- [x] 6.1 Fijar `<UseWindowsForms>false</UseWindowsForms>` en
       `GitExtensions.Extensibility.csproj` y compilar la solución completa
+      → el guardarraíl destapó 5 restos invisibles al grep (llegaban por los global usings
+      implícitos de WinForms): `Point`/`Color` (System.Drawing.Primitives, multiplataforma →
+      solo faltaba el `using System.Drawing;` explícito en IBrowseRepo/IGitModule/
+      SettingsSource); `Application.ExecutablePath` en DebugHelpers (→
+      `Environment.ProcessPath`); `Font` (GDI+, Windows-only) en FontParser y
+      SettingsSource.GetFont/SetFont (→ FontParser movido a GitExtUtils y Get/SetFont
+      convertidos en métodos de extensión allí; único consumidor: AppSettings); y
+      `ContextMenuStrip` en `IRepositoryHostPlugin.ConfigureContextMenu` (→ método retirado
+      de la interfaz; BlameControl construye ahora el menú "View in {0}" con la API neutral
+      ya existente — Name, IconData, GetHostedRemotesForModule/GetBlameUrl — y GitHub3
+      pierde su código WinForms de menús). Consumidores arreglados con `using GitExtUtils;`
+      (GitCommands, ResourceManager, BugReporter, 4 plugins); FontParserTests movido a
+      GitExtUtils.Tests; ambigüedad GitUI.MessageBoxes/GitExtUtils.MessageBoxes en Gource y
+      FindLargeFiles resuelta cualificando hacia GitExtUtils. Solución completa compila con
+      el guardarraíl activo
 - [ ] 6.2 `eng/Verify.ps1` completo en verde + smoke test manual del escenario de la spec:
       arrancar app → abrir repo → ejecutar un plugin → settings del plugin → editar y guardar
 - [ ] 6.3 Actualizar la hoja de ruta (0.2 completado) y registrar en el registro de
