@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.Text;
 using GitExtensions.Extensibility;
+using GitExtUtils;
 using GitUI;
 using Microsoft.VisualStudio.Threading;
 

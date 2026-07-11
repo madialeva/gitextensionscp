@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Globalization;
 using GitExtensions.Extensibility.Configurations;
 
@@ -110,11 +111,6 @@ public abstract class SettingsSource : IConfigValueStore
 
         SetValue(name, stringValue);
     }
-
-    [return: NotNullIfNotNull("defaultValue")]
-    public Font? GetFont(string name, Font? defaultValue) => FontParser.Parse(GetValue(name), defaultValue!);
-
-    public void SetFont(string name, Font? value) => SetValue(name, value?.AsString());
 
     public Color GetColor(string name, Color defaultValue)
     {

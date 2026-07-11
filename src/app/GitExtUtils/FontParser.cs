@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace GitExtensions.Extensibility;
+namespace GitExtUtils;
 
 public static class FontParser
 {

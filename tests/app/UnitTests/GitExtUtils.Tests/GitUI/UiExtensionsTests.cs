@@ -1,4 +1,4 @@
-﻿using GitExtensions.Extensibility.Extensions;
+﻿using GitExtUtils;
 
 namespace GitExtUtilsTests.GitUI;
 public sealed class UiExtensionsTests

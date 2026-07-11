@@ -7,6 +7,7 @@ using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.BuildServerIntegration;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Settings;
+using GitExtUtils;
 using GitUI;
 using GitUIPluginInterfaces.BuildServerIntegration;
 using Microsoft;

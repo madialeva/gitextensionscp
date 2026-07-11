@@ -6,6 +6,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
 using GitExtensions.Extensibility.Settings;
 using GitExtensions.Plugins.AutoCompileSubmodules.Properties;
+using GitExtUtils;
 using ResourceManager;
 
 namespace GitExtensions.Plugins.AutoCompileSubmodules;
