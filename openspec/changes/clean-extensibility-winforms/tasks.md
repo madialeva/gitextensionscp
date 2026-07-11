@@ -38,21 +38,33 @@
 
 ## 2. Capa iconos
 
-- [ ] 2.1 `IGitPlugin.Icon: Image?` → `IconData: byte[]?` (y `GitPluginBase`); helper para
+- [x] 2.1 `IGitPlugin.Icon: Image?` → `IconData: byte[]?` (y `GitPluginBase`); helper para
       leer el PNG embebido del ensamblado del plugin
-- [ ] 2.2 Migrar los iconos de los 12+ plugins integrados a `EmbeddedResource` PNG
-- [ ] 2.3 Adaptar los puntos de consumo en `GitUI` (menú/página de plugins) para
+      → `GitPluginBase.SetIconFromEmbeddedPng(fileName)`; también `AddCommitTemplate` y
+      `CommitTemplateManager`/`CommitTemplateItem` (GitCommands) pasan a `byte[]`
+- [x] 2.2 Migrar los iconos de los 12+ plugins integrados a `EmbeddedResource` PNG
+      → 11 plugins con icono; los PNG originales ya existían como ficheros
+- [x] 2.3 Adaptar los puntos de consumo en `GitUI` (menú/página de plugins) para
       materializar `byte[]` → `Image`; verificar visualmente que los iconos aparecen
+      → `IconDataExtensions.ToImage/ToPngBytes`; consumos: FormBrowse (menú Plugins),
+      FormSettings (árbol), FormCommit (plantillas), GitHub3 (menú contextual, helper local);
+      verificación visual pendiente del smoke test 6.2. Unit tests 15/15 verdes tras la capa
 
 ## 3. Capa owners
 
-- [ ] 3.1 Crear `IWindow` en `Extensibility`; sustituir `IWin32Window` en `IGitUICommands`
+- [x] 3.1 Crear `IWindow` en `Extensibility`; sustituir `IWin32Window` en `IGitUICommands`
       (~60 métodos), `GitUIEventArgs.OwnerForm`, `GitUIPostActionEventArgs` y cualquier otra
       firma pública
-- [ ] 3.2 Implementar `IWindow` en los Forms base de `GitUI` y crear el helper interno de
+      → también `MessageBoxes` de Extensibility (acepta `IWindow`, castea dentro) y
+      `GitTagController` (GitCommands)
+- [x] 3.2 Implementar `IWindow` en los Forms base de `GitUI` y crear el helper interno de
       traducción `IWindow` → `IWin32Window` en la implementación de `GitUICommands`
-- [ ] 3.3 Arreglar los call sites no mecánicos que el compilador señale (los `this` deben
+      → `GitExtensionsFormBase`, `GitExtensionsControl` (ResourceManager) y `BugReportForm`;
+      adaptadores en `GitUI.WindowExtensions` (`AsWinFormsWindow`/`AsApiWindow`)
+- [x] 3.3 Arreglar los call sites no mecánicos que el compilador señale (los `this` deben
       compilar sin cambios); `eng/Verify.ps1` en verde
+      → 143 conversiones automatizadas (script guiado por errores del compilador) + ~30
+      manuales (plugins con diálogos propios, LeftPanel/ParentWindow, TaskDialog, tests)
 
 ## 4. Capa settings
 

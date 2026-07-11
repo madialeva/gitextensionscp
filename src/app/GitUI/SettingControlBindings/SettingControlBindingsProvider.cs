@@ -1,5 +1,6 @@
 ﻿using GitExtensions.Extensibility.Settings;
-using GitExtensions.Extensibility.Settings.UserControls;
+using GitUI.CommandsDialogs.SettingsDialog;
+using GitUI.SettingControlBindings.UserControls;
 
 namespace GitUI.SettingControlBindings;
 
@@ -55,7 +56,14 @@ public static class SettingControlBindingsProvider
     /// </summary>
     /// <param name="setting">The setting to bind.</param>
     public static ISettingControlBinding CreateControlBinding(PseudoSetting setting)
-        => new PseudoSettingControlBinding(setting, setting.CustomControl);
+        => new PseudoSettingControlBinding(setting);
+
+    /// <summary>
+    ///  Creates a control binding for the given <see cref="LinkSetting"/>.
+    /// </summary>
+    /// <param name="setting">The setting to bind.</param>
+    public static ISettingControlBinding CreateControlBinding(LinkSetting setting)
+        => new LinkSettingControlBinding(setting);
 
     /// <summary>
     ///  Creates a control binding for the given <see cref="NumberSetting{T}"/> where T is <see cref="int"/>.
@@ -87,27 +95,22 @@ public static class SettingControlBindingsProvider
     /// </exception>
     public static ISettingControlBinding CreateControlBinding(ISetting setting)
     {
-        if (setting.CreateControlBinding() is { } customBinding)
-        {
-            return customBinding;
-        }
-
         return setting switch
         {
-            BoolSetting s => CreateControlBinding(s, s.CustomControl),
-            CredentialsSetting s => CreateControlBinding(s, s.CustomControl),
-            PasswordSetting s => CreateControlBinding(s, s.CustomControl),
-            StringSetting s => CreateControlBinding(s, s.CustomControl),
-            ChoiceSetting s => CreateControlBinding(s, s.CustomControl),
+            // GitUI's own adapter carries a pre-existing designer control; must match before ChoiceSetting.
+            StringComboBoxAdapter a => CreateControlBinding(a, a.ComboBox),
+            BoolSetting s => CreateControlBinding(s, control: null),
+            CredentialsSetting s => CreateControlBinding(s, control: null),
+            PasswordSetting s => CreateControlBinding(s, control: null),
+            StringSetting s => CreateControlBinding(s, control: null),
+            ChoiceSetting s => CreateControlBinding(s, control: null),
             PseudoSetting s => CreateControlBinding(s),
-            NumberSetting<int> s => CreateControlBinding(s, s.CustomControl),
-            NumberSetting<float> s => CreateControlBinding(s, s.CustomControl as TextBox),
-            NumberSetting<double> s => CreateControlBinding(s, s.CustomControl as TextBox),
-            NumberSetting<long> s => CreateControlBinding(s, s.CustomControl as TextBox),
-            _ => throw new NotSupportedException($"""
-                No control binding registered for {setting.GetType().Name}.
-                Consider implementing ISetting.CreateControlBinding and provide your own control binding in your plugin.
-                """)
+            LinkSetting s => CreateControlBinding(s),
+            NumberSetting<int> s => CreateControlBinding(s, control: null),
+            NumberSetting<float> s => CreateControlBinding(s, (TextBox?)null),
+            NumberSetting<double> s => CreateControlBinding(s, (TextBox?)null),
+            NumberSetting<long> s => CreateControlBinding(s, (TextBox?)null),
+            _ => throw new NotSupportedException($"No control binding registered for {setting.GetType().Name}.")
         };
     }
 }
