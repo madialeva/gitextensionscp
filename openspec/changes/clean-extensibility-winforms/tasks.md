@@ -83,10 +83,9 @@
       → namespace `GitUI.SettingControlBindings`; sorpresa: el generador Roslyn del repo
       crea ctors [Obsolete] sin parámetros — el binding llama al ctor real con argumentos
       explícitos. Tests de bindings adaptados a inyección por ctor. 15/15 suites verdes
-- [ ] 4.4 Verificar la tubería de traducción del `CredentialsControl` reubicado (el resx debe
+- [x] 4.4 Verificar la tubería de traducción del `CredentialsControl` reubicado (el resx debe
       seguir entrando en los `.xlf`) y el escenario de credenciales; `eng/Verify.ps1` en verde
-      → parcial: Verify verde tras la capa; la comprobación de traducción/credenciales se
-      hace con el smoke test 6.2
+      → Verify verde tras la capa; traducción/credenciales confirmados en el smoke test 6.2
 
 ## 5. Capa varios y barrido
 
@@ -123,9 +122,12 @@
       GitExtUtils.Tests; ambigüedad GitUI.MessageBoxes/GitExtUtils.MessageBoxes en Gource y
       FindLargeFiles resuelta cualificando hacia GitExtUtils. Solución completa compila con
       el guardarraíl activo
-- [ ] 6.2 `eng/Verify.ps1` completo en verde + smoke test manual del escenario de la spec:
+- [x] 6.2 `eng/Verify.ps1` completo en verde + smoke test manual del escenario de la spec:
       arrancar app → abrir repo → ejecutar un plugin → settings del plugin → editar y guardar
       → Verify en verde con el guardarraíl activo (build limpio + 15/15 suites, 4:12);
-      pendiente solo el smoke test manual
-- [ ] 6.3 Actualizar la hoja de ruta (0.2 completado) y registrar en el registro de
+      smoke test manual superado (2026-07-12): app arranca, iconos de plugins visibles,
+      diálogo de plugin modal OK, settings de GitHub3 con LinkSettings funcionales y
+      persistencia de valores OK, menú "View in GitHub" del blame operativo
+- [x] 6.3 Actualizar la hoja de ruta (0.2 completado) y registrar en el registro de
       decisiones interno las decisiones tomadas durante la implementación
+      → hoja de ruta y registro de decisiones internos actualizados (2026-07-12)
