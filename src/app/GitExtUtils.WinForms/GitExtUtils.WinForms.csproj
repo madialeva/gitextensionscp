@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Windows-only sibling of GitExtUtils (change 0.3, extract-ui-interops): Win32 interops,
+       WinForms control extensions, DPI utilities and GDI+ theming extracted from GitExtUtils
+       so that the latter (a dependency of the GitCommands core) stays free of UI technology.
+       Types moved here keep their original namespaces (GitExtUtils.*, GitUI.*) on purpose:
+       only the packaging changed, not the contract. See README.md in this directory. -->
+
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GitUI\Interops\BOOL.cs" Link="GitUI\Interops\BOOL.cs" />
+    <Compile Include="..\GitUI\Interops\RECT.cs" Link="GitUI\Interops\RECT.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GitExtensions.Extensibility\GitExtensions.Extensibility.csproj" />
+    <ProjectReference Include="..\GitExtUtils\GitExtUtils.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,9 +1,8 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyDescription("GitExtensions common")]
+[assembly: AssemblyDescription("GitExtensions common (Windows/WinForms-only)")]
 
-[assembly: InternalsVisibleTo("GitExtUtils.WinForms")]
 [assembly: InternalsVisibleTo("GitExtUtils.Tests")]
 [assembly: InternalsVisibleTo("GitUI.Tests")]
 [assembly: InternalsVisibleTo("GitExtensions")]
