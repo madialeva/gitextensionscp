@@ -2,12 +2,14 @@
 
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\GitUI\Interops\BOOL.cs" Link="GitUI\Interops\BOOL.cs" />
-    <Compile Include="..\GitUI\Interops\RECT.cs" Link="GitUI\Interops\RECT.cs" />
-  </ItemGroup>
+    <!-- Guardrail (change 0.3, extract-ui-interops): this assembly is a dependency of the
+         GitCommands core and must stay free of UI technology. Win32 interops, WinForms
+         control extensions and GDI+ theming live in GitExtUtils.WinForms instead.
+         Overrides the repo-wide UseWindowsForms=true from Directory.Build.props; any WinForms
+         type reintroduced in this project will fail to compile. -->
+    <UseWindowsForms>false</UseWindowsForms>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AdysTech.CredentialManager" />

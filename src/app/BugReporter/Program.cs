@@ -23,6 +23,9 @@ internal static class Program
             ThreadHelper.JoinableTaskContext = new JoinableTaskContext();
         }
 
+        // Route fire-and-forget exceptions to WinForms (TaskManager is UI-neutral and only traces by default)
+        TaskManager.ExceptionReporter = Application.OnThreadException;
+
         // If an error happens before we had a chance to init the environment information
         // the call to GetInformation() from BugReporter.ShowNBug() will fail.
         // There's no perf hit calling Initialise() multiple times.
