@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 
+using System.Drawing;
+
 namespace GitUI;
 
 /// <summary>

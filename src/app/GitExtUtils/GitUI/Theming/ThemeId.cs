@@ -19,14 +19,6 @@ public readonly struct ThemeId
     public string Name { get; }
     public bool IsBuiltin { get; }
 
-    /// <summary>
-    /// Get the default ThemeId for the current Windows SystemColorMode
-    /// </summary>
-    public static ThemeId ColorModeThemeId
-        => Application.SystemColorMode == SystemColorMode.Dark
-            ? ThemeId.DefaultDark
-            : ThemeId.DefaultLight;
-
     public ThemeId(string name, bool isBuiltin = false)
     {
         Name = string.IsNullOrWhiteSpace(name) || (isBuiltin && name.Equals(InvariantThemeFileName, StringComparison.OrdinalIgnoreCase))
