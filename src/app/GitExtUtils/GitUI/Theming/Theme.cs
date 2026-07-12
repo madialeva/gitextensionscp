@@ -1,4 +1,6 @@
-﻿namespace GitExtUtils.GitUI.Theming;
+﻿using System.Drawing;
+
+namespace GitExtUtils.GitUI.Theming;
 
 /// <summary>
 /// A set of values for .Net system colors and GitExtensions app-specific colors.
@@ -28,12 +30,11 @@ public class Theme : IThemeSerializationData
     public ThemeId Id { get; }
 
     /// <summary>
-    /// Get the Windows SystemColorMode for this theme, based on the background color.
+    /// Whether this theme is a dark theme, based on the background color.
+    /// The WinForms shell maps this onto <c>SystemColorMode</c> (see ThemeSystemColorMode).
     /// </summary>
-    public SystemColorMode SystemColorMode
-        => new HslColor(GetColor(AppColor.PanelBackground)).L < 0.5
-            ? SystemColorMode.Dark
-            : SystemColorMode.Classic;
+    public bool IsDark
+        => new HslColor(GetColor(AppColor.PanelBackground)).L < 0.5;
 
     /// <summary>
     /// Get GitExtensions app-specific color value as defined by this instance. If not defined,
