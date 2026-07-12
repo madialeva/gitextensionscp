@@ -68,7 +68,9 @@ public static partial class AppSettings
             }
 
             // Make ApplicationDataPath version independent
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ApplicationId);
+            string appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ApplicationId);
+            Directory.CreateDirectory(appDataDir);
+            return appDataDir;
         });
 
         LocalApplicationDataPath = new Lazy<string?>(() =>
