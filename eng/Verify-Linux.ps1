@@ -27,6 +27,13 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $testResultsDir = Join-Path $repoRoot "artifacts\$Configuration\TestResults"
 
+# EnableWindowsTargeting is required on Linux because the multi-target
+# test projects list net10.0-windows alongside net10.0.  MSBuild needs
+# this flag to evaluate (not compile) Windows TFMs during restore.
+$msbuildArgs = @(
+    '-p:EnableWindowsTargeting=true'
+)
+
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 # Core assemblies that MUST compile as net10.0.
@@ -44,7 +51,7 @@ Write-Host ''
 Write-Host "=== Verify-Linux: build core assemblies ===" -ForegroundColor Cyan
 foreach ($proj in $coreProjects) {
     Write-Host "  $proj"
-    dotnet build (Join-Path $repoRoot $proj) -c $Configuration
+    dotnet build (Join-Path $repoRoot $proj) -c $Configuration @msbuildArgs
     if ($LASTEXITCODE -ne 0) {
         Write-Host ''
         Write-Host "VERIFY-LINUX FAILED: build of $proj failed." -ForegroundColor Red
@@ -68,7 +75,7 @@ Write-Host "=== Verify-Linux: GitCommands.Tests (net10.0 subset) ===" -Foregroun
 # Tests that need JoinableTaskFactory will fail (~240 of ~3450) — expected.
 
 $testsProj = Join-Path $repoRoot 'tests\app\UnitTests\GitCommands.Tests\GitCommands.Tests.csproj'
-dotnet test $testsProj -f net10.0 -c $Configuration `
+dotnet test $testsProj -f net10.0 -c $Configuration @msbuildArgs `
     --logger "trx;LogFileName=GitCommands.Tests.trx" `
     --results-directory $testResultsDir
 
