@@ -21,7 +21,7 @@ public static class ExceptionUtils
     {
         if (!(canIgnore && IsIgnorable(e)))
         {
-            MessageBoxes.ShowError(owner, string.Join(Environment.NewLine + Environment.NewLine, info, e.ToStringWithData()));
+            UserMessageHandler.ShowError(owner, string.Join(Environment.NewLine + Environment.NewLine, info, e.ToStringWithData()), null);
         }
     }
 

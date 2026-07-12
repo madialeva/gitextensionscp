@@ -75,7 +75,7 @@ public partial class GitSettingsPage : SettingsPageWithHeader
     {
         CheckSettingsLogic.SolveLinuxToolsDir(LinuxToolsDir.Text.Trim());
 
-        string? userSelectedPath = OsShellUtil.PickFolder(this, AppSettings.LinuxToolsDir);
+        string? userSelectedPath = OsShellUtil.PickFolder(this.AsApiWindow(), AppSettings.LinuxToolsDir);
 
         if (userSelectedPath is not null)
         {
