@@ -53,7 +53,7 @@ public partial class FolderBrowserButton : GitExtensionsControl
         directoryInfoPath ??= getter();
 
         // TODO: do we need ParentForm or is "this" ok?
-        string? userSelectedPath = OsShellUtil.PickFolder(ParentForm!, directoryInfoPath!);
+        string? userSelectedPath = OsShellUtil.PickFolder(ParentForm!.AsApiWindow(), directoryInfoPath!);
 
         if (userSelectedPath is not null)
         {

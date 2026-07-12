@@ -283,7 +283,7 @@ public partial class FormFixHome : GitExtensionsForm
 
     private void otherHomeBrowse_Click(object sender, EventArgs e)
     {
-        string? userSelectedPath = OsShellUtil.PickFolder(this, Environment.GetEnvironmentVariable("USERPROFILE"));
+        string? userSelectedPath = OsShellUtil.PickFolder(this.AsApiWindow(), Environment.GetEnvironmentVariable("USERPROFILE"));
 
         if (userSelectedPath is not null)
         {
