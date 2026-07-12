@@ -63,7 +63,7 @@ foreach ($project in $testProjects) {
     Write-Host ''
     Write-Host "--- $($project.BaseName)" -ForegroundColor Cyan
     # --no-build: the solution build above already compiled every test project.
-    dotnet test $project.FullName -c $Configuration --no-build `
+    dotnet test $project.FullName -c $Configuration --no-build -f net10.0-windows `
         --logger "trx;LogFileName=$($project.BaseName).trx" `
         --results-directory $testResultsDir
     $results += [pscustomobject]@{
