@@ -5,6 +5,8 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
+    <TargetFramework>net10.0</TargetFramework>
+
     <!-- Guardrail (change 0.2, clean-extensibility-winforms): this assembly is the public,
          UI-technology-neutral extensibility contract. It must never reference WinForms/GDI+.
          Overrides the repo-wide UseWindowsForms=true from Directory.Build.props; any WinForms

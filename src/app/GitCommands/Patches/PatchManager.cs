@@ -295,7 +295,7 @@ public static class PatchManager
             return null;
         }
 
-        result.Append($"\n--\n{Application.ProductName} {AppSettings.ProductVersion}");
+        result.Append($"\n--\n{AppSettings.ApplicationName} {AppSettings.ProductVersion}");
 
         return result.ToString();
     }

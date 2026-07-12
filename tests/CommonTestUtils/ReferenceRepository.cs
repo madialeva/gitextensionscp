@@ -1,4 +1,5 @@
 ﻿using GitCommands;
+using GitExtensions.Extensibility;
 using GitExtUtils.Tasks;
 using LibGit2Sharp;
 
@@ -9,6 +10,10 @@ public class ReferenceRepository : IDisposable
     static ReferenceRepository()
     {
         Epilogue.RegisterAfterSuiteAction(order: 1, ReleaseNextRepositories);
+    }
+
+    private sealed class DummyWindow : IWindow
+    {
     }
 
     private static readonly Lock _nextLock = new();
@@ -26,7 +31,7 @@ public class ReferenceRepository : IDisposable
     private readonly GitModuleTestHelper _moduleTestHelper;
 
     // We don't expect any failures so that we won't be switching to the main thread or showing messages
-    public static Control DummyOwner { get; } = new();
+    public static IWindow DummyOwner { get; } = new DummyWindow();
 
     public GitModule Module => _moduleTestHelper.Module;
 

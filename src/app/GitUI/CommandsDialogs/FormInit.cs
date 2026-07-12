@@ -103,7 +103,7 @@ public partial class FormInit : GitExtensionsDialog
 
     private void BrowseClick(object sender, EventArgs e)
     {
-        string? userSelectedPath = OsShellUtil.PickFolder(this);
+        string? userSelectedPath = OsShellUtil.PickFolder(this.AsApiWindow(), null);
 
         if (userSelectedPath is not null)
         {

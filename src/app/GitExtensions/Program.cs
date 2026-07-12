@@ -112,6 +112,21 @@ internal static class Program
         // Route fire-and-forget exceptions to WinForms (TaskManager is UI-neutral and only traces by default)
         TaskManager.ExceptionReporter = Application.OnThreadException;
 
+        // Route core error messages to WinForms dialogs (UserMessageHandler is UI-neutral and only traces by default)
+        UserMessageHandler.ShowError = (owner, text, caption) => GitExtUtils.MessageBoxes.ShowError(owner, text, caption);
+
+        // Route folder picker to WinForms dialog (OsShellUtil.PickFolder is UI-neutral by default)
+        OsShellUtil.PickFolder = (owner, selectedPath) =>
+        {
+            using FolderBrowserDialog dialog = new();
+            if (selectedPath is not null)
+            {
+                dialog.SelectedPath = selectedPath;
+            }
+
+            return dialog.ShowDialog(owner as IWin32Window) == DialogResult.OK ? dialog.SelectedPath : null;
+        };
+
         ManagedExtensibility.Initialise(userPluginsPath: AppSettings.UserPluginsPath);
 
         AppSettings.LoadSettings();
