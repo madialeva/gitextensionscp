@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Change 0.4 (canary-multiplatform): target the neutral net10.0 TFM instead of
+         inheriting net10.0-windows from Directory.Build.props. -->
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Guardrail (change 0.4): this assembly must not depend on WinForms. Overrides the
+         repo-wide UseWindowsForms=true from Directory.Build.props. -->
+    <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>$(DefineConstants);TRACE_REVISIONREADER</DefineConstants>
@@ -20,6 +28,8 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" />
+    <PackageReference Include="System.Drawing.Common" />
     <PackageReference Include="System.IO.Abstractions" />
     <PackageReference Include="System.Reactive.Linq" />
   </ItemGroup>
@@ -27,10 +37,6 @@
   <ItemGroup>
     <ProjectReference Include="..\GitExtensions.Extensibility\GitExtensions.Extensibility.csproj" />
     <ProjectReference Include="..\GitExtUtils\GitExtUtils.csproj" />
-    <!-- TEMPORAL hasta el change 0.4: GitCommands usa MessageBoxes (avisos al usuario) que
-         vive en el ensamblado WinForms. El 0.4 abstrae esos avisos y retira esta referencia
-         para poder retargetear GitCommands a net10.0 neutro. -->
-    <ProjectReference Include="..\GitExtUtils.WinForms\GitExtUtils.WinForms.csproj" />
     <ProjectReference Include="..\..\plugins\GitUIPluginInterfaces\GitUIPluginInterfaces.csproj" />
   </ItemGroup>
 

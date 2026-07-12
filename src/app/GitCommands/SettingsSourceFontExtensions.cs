@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using GitExtensions.Extensibility.Settings;
 
 namespace GitExtUtils;

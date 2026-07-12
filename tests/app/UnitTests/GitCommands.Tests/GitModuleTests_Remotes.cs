@@ -1,4 +1,5 @@
 ﻿using System.Collections.Frozen;
+using System.Drawing;
 using CommonTestUtils;
 using GitCommands;
 using GitCommands.Config;
