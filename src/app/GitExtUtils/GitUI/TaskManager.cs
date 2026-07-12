@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.VisualStudio.Threading;
 
 namespace GitUI;
@@ -8,6 +8,16 @@ public class TaskManager
     private static readonly CancellationTokenSequence _switchToMainThreadCancellationTokenSequence = new();
 
     private static CancellationToken _switchToMainThreadCancellationToken = _switchToMainThreadCancellationTokenSequence.Next();
+
+    /// <summary>
+    ///  Receives the (demystified) exceptions of fire-and-forget operations. This assembly is
+    ///  UI-technology neutral and cannot report to the UI itself: the WinForms shell installs
+    ///  <c>Application.OnThreadException</c> here at startup (Program.cs, BugReporter, test
+    ///  infrastructure). The default merely traces.
+    /// </summary>
+    public static Action<Exception> ExceptionReporter { get; set; } = ex => Trace.TraceError(ex.ToString());
+
+    internal static CancellationToken SwitchToMainThreadCancellationToken => _switchToMainThreadCancellationToken;
 
     private readonly JoinableTaskCollection _joinableTaskCollection;
 
@@ -75,7 +85,7 @@ public class TaskManager
     }
 
     /// <summary>
-    /// Asynchronously run <paramref name="asyncAction"/> on a background thread and forward all exceptions to <see cref="Application.OnThreadException"/> except for <see cref="OperationCanceledException"/>, which is ignored.
+    /// Asynchronously run <paramref name="asyncAction"/> on a background thread and forward all exceptions to <see cref="ExceptionReporter"/> except for <see cref="OperationCanceledException"/>, which is ignored.
     /// </summary>
     public void FileAndForget(Func<Task> asyncAction)
     {
@@ -87,7 +97,7 @@ public class TaskManager
     }
 
     /// <summary>
-    /// Asynchronously run <paramref name="action"/> on a background thread and forward all exceptions to <see cref="Application.OnThreadException"/> except for <see cref="OperationCanceledException"/>, which is ignored.
+    /// Asynchronously run <paramref name="action"/> on a background thread and forward all exceptions to <see cref="ExceptionReporter"/> except for <see cref="OperationCanceledException"/>, which is ignored.
     /// </summary>
     public void FileAndForget(Action action)
     {
@@ -95,38 +105,12 @@ public class TaskManager
     }
 
     /// <summary>
-    /// Asynchronously run <paramref name="task"/> on a background thread and forward all exceptions to <see cref="Application.OnThreadException"/> except for <see cref="OperationCanceledException"/>, which is ignored.
+    /// Asynchronously run <paramref name="task"/> on a background thread and forward all exceptions to <see cref="ExceptionReporter"/> except for <see cref="OperationCanceledException"/>, which is ignored.
     /// </summary>
     public void FileAndForget(Task task)
     {
         TimeSpan infiniteTimeout = new(-TimeSpan.TicksPerMillisecond);
         FileAndForget(() => task.WaitAsync(infiniteTimeout));
-    }
-
-    /// <summary>
-    /// Asynchronously run <paramref name="asyncAction"/> on the UI thread and forward all exceptions to <see cref="Application.OnThreadException"/> except for <see cref="OperationCanceledException"/>, which is ignored.
-    /// </summary>
-    public void InvokeAndForget(Control control, Func<Task> asyncAction, CancellationToken cancellationToken = default)
-    {
-        _ = JoinableTaskFactory.RunAsync(() =>
-            HandleExceptionsAsync(async () =>
-                {
-                    if (!JoinableTaskContext.IsOnMainThread)
-                    {
-                        await control.SwitchToMainThreadAsync(cancellationToken.CombineWith(_switchToMainThreadCancellationToken).Token);
-                    }
-
-                    await asyncAction();
-                },
-                ReportExceptionOnMainThreadAsync));
-    }
-
-    /// <summary>
-    /// Asynchronously run <paramref name="action"/> on the UI thread and forward all exceptions to <see cref="Application.OnThreadException"/> except for <see cref="OperationCanceledException"/>, which is ignored.
-    /// </summary>
-    public void InvokeAndForget(Control control, Action action, CancellationToken cancellationToken = default)
-    {
-        InvokeAndForget(control, AsyncAction(action), cancellationToken);
     }
 
     public async Task JoinPendingOperationsAsync(CancellationToken cancellationToken)
@@ -152,7 +136,7 @@ public class TaskManager
     }
 
     /// <summary>
-    /// Forward the exception <paramref name="ex"/> to <see cref="Application.OnThreadException"/> on the main thread.
+    /// Forward the exception <paramref name="ex"/> to <see cref="ExceptionReporter"/> on the main thread.
     /// </summary>
     /// The readability of the callstack is improved by calling <c>ExceptionExtensions.Demystify</c>.
     internal async Task ReportExceptionOnMainThreadAsync(Exception ex)
@@ -164,7 +148,7 @@ public class TaskManager
                 await JoinableTaskFactory.SwitchToMainThreadAsync(_switchToMainThreadCancellationToken);
             }
 
-            Application.OnThreadException(ex.Demystify());
+            ExceptionReporter(ex.Demystify());
         }
         catch (Exception exceptionWhileReporting)
         {

@@ -109,6 +109,9 @@ internal static class Program
             ThreadHelper.JoinableTaskContext = new JoinableTaskContext();
         }
 
+        // Route fire-and-forget exceptions to WinForms (TaskManager is UI-neutral and only traces by default)
+        TaskManager.ExceptionReporter = Application.OnThreadException;
+
         ManagedExtensibility.Initialise(userPluginsPath: AppSettings.UserPluginsPath);
 
         AppSettings.LoadSettings();

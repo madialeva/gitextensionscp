@@ -57,11 +57,23 @@ referencias de proyecto. Contraste didáctico con el 0.2: allí los movimientos 
 - `ThreadHelper`: el núcleo (JoinableTaskContext/Factory, `ThrowIfNotOnUIThread`,
   `FileAndForget`) se queda; las extensiones sobre `Control` (`InvokeAndForget(this Control…)`)
   se parten a un fichero nuevo (`ControlThreadHelperExtensions`) en el proyecto WinForms.
+  **Corrección durante implementación**: `TaskManager` también es mixto, y no solo por sus
+  `InvokeAndForget(Control, …)`: su reporte de excepciones (`ReportExceptionOnMainThreadAsync`,
+  usado por el `FileAndForget` que consume GitCommands) llama a
+  `Application.OnThreadException`. Se resuelve con un callback estático inyectable en
+  `TaskManager` (default: `Trace`); la shell WinForms lo fija al arrancar. El salto al main
+  thread previo al reporte se queda en el núcleo (es VS-Threading, neutro).
 - `Theming`: la frontera es "datos vs pintura". `AppColor`/`AppColorDefaults` (enum + tabla
   de `Color` de Primitives, usados por `AppSettings` en GitCommands) se quedan; todo lo que
   toca `Control`/GDI+ de verdad (`ThemeFix`, `TabControlRenderer`, `BrushScope`…) se mueve.
   Si el inventario 1.1 encuentra acoplamientos datos→pintura, se parte el fichero, no se
   arrastra la pintura a la base.
+  **Corrección durante implementación**: la mitad "datos" tenía dos ganchos WinForms que el
+  guardarraíl destapó — `Theme.SystemColorMode` (tipo WinForms en la firma; se sustituye por
+  la propiedad neutra `Theme.IsDark` y una extensión `GetSystemColorMode()` en el puente
+  WinForms `ThemeSystemColorMode`) y `ThemeId.ColorModeThemeId` (leía
+  `Application.SystemColorMode`; se muda al mismo puente). `OtherColors` resultó ser de la
+  mitad pintura (usa `Application.IsDarkModeEnabled`) y se mueve entero.
 - Regla general ante la duda: **lo que `GitCommands` necesita marca lo que se queda**; el
   resto, si menciona WinForms, se va. El árbitro final es el guardarraíl (D5).
 
