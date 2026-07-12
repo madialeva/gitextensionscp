@@ -50,7 +50,7 @@ env:
 # Aquí hay un único job: verificar.
 # -----------------------------------------------------------------------------
 jobs:
-  verify:
+  verify-windows:
     name: Build + unit tests (Windows)
 
     # Runner hospedado por GitHub: Windows Server con git, PowerShell (pwsh)
@@ -95,6 +95,34 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: test-results-${{ github.run_number }}
+          name: test-results-windows-${{ github.run_number }}
+          path: artifacts/Release/TestResults/*.trx
+          retention-days: 31
+
+  verify-linux:
+    name: Build + unit tests (Linux canary)
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Instalar .NET SDK (según global.json)
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - name: Verificar Linux (core net10.0 + GitCommands.Tests subset)
+        run: pwsh -File eng/Verify-Linux.ps1
+
+      - name: Publicar resultados de tests (solo si falla)
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results-linux-${{ github.run_number }}
           path: artifacts/Release/TestResults/*.trx
           retention-days: 31
