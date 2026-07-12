@@ -1,4 +1,5 @@
-﻿using Microsoft;
+﻿using System.Drawing;
+using Microsoft;
 
 namespace GitCommands.UserRepositoryHistory;
 
@@ -366,7 +367,9 @@ public class RecentRepoSplitter
                 {
                     canShorten = ShortenPath(skipCount);
                     skipCount++;
-                    captionSize = TextRenderer.MeasureText(repoInfo.Caption, MeasureFont);
+                    using Bitmap bmp = new(1, 1);
+                    using Graphics g = Graphics.FromImage(bmp);
+                    captionSize = g.MeasureString(repoInfo.Caption!, MeasureFont!);
                 }
                 while (captionSize.Width > RecentReposComboMinWidth - 10 && canShorten);
             }

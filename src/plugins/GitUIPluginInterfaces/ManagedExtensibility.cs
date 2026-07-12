@@ -46,7 +46,7 @@ public static class ManagedExtensibility
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        string defaultPluginsPath = Path.Join(new FileInfo(Application.ExecutablePath).Directory!.FullName, "Plugins");
+        string defaultPluginsPath = Path.Join(new FileInfo(Environment.ProcessPath!).Directory!.FullName, "Plugins");
         string? userPluginsPath = UserPluginsPath;
 
         // The plugins that are bundled up with the app must follow this naming convention: GitExtensions.Plugins.*.dll
