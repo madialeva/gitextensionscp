@@ -23,6 +23,10 @@ public sealed class ConfigureJoinableTaskFactoryAttribute : Attribute, ITestActi
     public ConfigureJoinableTaskFactoryAttribute()
     {
         Application.ThreadException += HandleApplicationThreadException;
+
+        // Route fire-and-forget exceptions to WinForms so that the handler above sees them
+        // (TaskManager is UI-neutral and only traces by default)
+        TaskManager.ExceptionReporter = Application.OnThreadException;
     }
 
     public void BeforeTest(ITest test)
