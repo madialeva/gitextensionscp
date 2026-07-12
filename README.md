@@ -27,8 +27,8 @@ The journey started on **July 11, 2026**, from the upstream stable tag `v7.2.0`.
 
 🚧 **Early days.** The migration is being developed incrementally, phase by phase:
 
-1. **Phase 0 — Foundations**: decouple the core from WinForms and prove it builds and passes
-   its tests on Linux.
+1. **Phase 0 — Foundations** ✅: decoupled the core from WinForms, retargeted to `net10.0`,
+   and proved it builds and passes tests on Linux in CI.
 2. **Phase 1 — Walking skeleton**: a minimal Avalonia app that opens a repository.
 3. **Phase 2 — Vertical slice**: commit graph and diff viewer (read-only browsing).
 4. **Phase 3 — Write operations**: commit, push/pull, branches…
