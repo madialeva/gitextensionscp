@@ -37,17 +37,17 @@ internal sealed class StashNode : BaseRevisionNode
 
     internal bool OpenStash(IWin32Window owner)
     {
-        return UICommands.StartStashDialog(owner, manageStashes: true, ReflogSelector);
+        return UICommands.StartStashDialog(owner.AsApiWindow(), manageStashes: true, ReflogSelector);
     }
 
     public void ApplyStash(IWin32Window owner)
     {
-        UICommands.StashApply(owner, ReflogSelector);
+        UICommands.StashApply(owner.AsApiWindow(), ReflogSelector);
     }
 
     public void PopStash(IWin32Window owner)
     {
-        UICommands.StashPop(owner, ReflogSelector);
+        UICommands.StashPop(owner.AsApiWindow(), ReflogSelector);
     }
 
     public void DropStash(IWin32Window owner)
@@ -85,7 +85,7 @@ internal sealed class StashNode : BaseRevisionNode
 
             if (result == TaskDialogButton.Yes)
             {
-                UICommands.StashDrop(owner, ReflogSelector);
+                UICommands.StashDrop(owner.AsApiWindow(), ReflogSelector);
             }
         }
     }

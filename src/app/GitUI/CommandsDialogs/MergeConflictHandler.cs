@@ -19,7 +19,7 @@ public static class MergeConflictHandler
 
         if (offerUpdateSubmodules)
         {
-            commands.UpdateSubmodules(owner);
+            commands.UpdateSubmodules(owner.AsApiWindow());
         }
 
         return false;
@@ -29,21 +29,21 @@ public static class MergeConflictHandler
     {
         if (commands.Module.InTheMiddleOfConflictedMerge())
         {
-            commands.StartResolveConflictsDialog(owner, offerCommit);
+            commands.StartResolveConflictsDialog(owner.AsApiWindow(), offerCommit);
         }
 
         if (commands.Module.InTheMiddleOfPatch())
         {
             if (MessageBoxes.MiddleOfPatchApply(owner))
             {
-                commands.StartApplyPatchDialog(owner);
+                commands.StartApplyPatchDialog(owner.AsApiWindow());
             }
         }
         else if (commands.Module.InTheMiddleOfRebase())
         {
             if (MessageBoxes.MiddleOfRebase(owner))
             {
-                commands.StartTheContinueRebaseDialog(owner);
+                commands.StartTheContinueRebaseDialog(owner.AsApiWindow());
             }
         }
     }

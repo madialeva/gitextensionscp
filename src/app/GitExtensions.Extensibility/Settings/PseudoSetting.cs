@@ -1,41 +1,24 @@
-﻿namespace GitExtensions.Extensibility.Settings;
+namespace GitExtensions.Extensibility.Settings;
 
 /// <summary>
-/// Not a real setting (as it save no setting value). It is used to display a control that is not a setting (linklabel, text,...)
+///  Not a real setting (it saves no value): displays a block of read-only text in a settings
+///  page. Pure data — the UI layer decides how to render it (a read-only text box in WinForms).
 /// </summary>
 public class PseudoSetting : ISetting
 {
-    private readonly Func<TextBox>? _textBoxCreator;
-
-    public PseudoSetting(Control control, string caption = "")
+    public PseudoSetting(string text, string caption = "    ", int? height = null)
     {
+        Text = text;
         Caption = caption;
-        CustomControl = control;
-    }
-
-    public PseudoSetting(string text, string caption = "    ", int? height = null, Action<TextBox>? textboxSettings = null)
-    {
-        Caption = caption;
-
-        _textBoxCreator = () =>
-        {
-            TextBox textbox = new() { ReadOnly = true, BorderStyle = BorderStyle.None, Text = text };
-
-            if (height.HasValue)
-            {
-                textbox.Multiline = true;
-                textbox.Height = height.Value;
-            }
-
-            textboxSettings?.Invoke(textbox);
-            return textbox;
-        };
-
-        CustomControl = _textBoxCreator();
+        Height = height;
     }
 
     public string Name { get; } = "PseudoSetting";
     public string Caption { get; }
-    public Control? CustomControl { get; set; }
-    public Func<TextBox>? TextBoxCreator => _textBoxCreator;
+
+    /// <summary>The text to display.</summary>
+    public string Text { get; }
+
+    /// <summary>Fixed height in pixels for multi-line text, or <see langword="null"/> for a single line.</summary>
+    public int? Height { get; }
 }

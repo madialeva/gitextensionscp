@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -24,7 +24,7 @@ public class GitStatisticsPlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("17D1507D-C00D-4A10-AB75-DECB2EA5FCBF");
         Name = "Statistics";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconGitStatistics;
+        SetIconFromEmbeddedPng("IconGitStatistics.png");
     }
 
     public override IEnumerable<ISetting> GetSettings()
@@ -50,7 +50,7 @@ public class GitStatisticsPlugin : GitPluginBase, IGitPluginForRepository
 
         using (formStatistics)
         {
-            formStatistics.ShowDialog(args.OwnerForm);
+            formStatistics.ShowDialog(args.OwnerForm as IWin32Window);
         }
 
         return false;

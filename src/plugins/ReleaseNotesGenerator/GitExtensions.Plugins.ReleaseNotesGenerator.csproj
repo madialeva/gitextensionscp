@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\app\GitCommands\GitCommands.csproj">
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconReleaseNotesGenerator.png" />
+    <EmbeddedResource Include="Resources\IconReleaseNotesGenerator.png" />
   </ItemGroup>
 
   <ItemGroup>

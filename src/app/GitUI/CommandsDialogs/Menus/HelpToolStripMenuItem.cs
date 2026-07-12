@@ -55,7 +55,7 @@ internal partial class HelpToolStripMenuItem : ToolStripMenuItemEx
 
     private void TsmiTelemetryEnabled_Click(object sender, EventArgs e)
     {
-        UICommands.StartGeneralSettingsDialog(OwnerForm);
+        UICommands.StartGeneralSettingsDialog(OwnerForm.AsApiWindow());
     }
 
     private void UserManualToolStripMenuItemClick(object sender, EventArgs e)

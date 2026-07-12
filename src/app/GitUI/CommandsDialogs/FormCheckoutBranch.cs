@@ -342,7 +342,7 @@ public partial class FormCheckoutBranch : GitExtensionsDialog
             stash = _isDirtyDir == true;
             if (stash)
             {
-                UICommands.StashSave(owner, AppSettings.IncludeUntrackedFilesInAutoStash);
+                UICommands.StashSave(owner.AsApiWindow(), AppSettings.IncludeUntrackedFilesInAutoStash);
             }
         }
 
@@ -354,7 +354,7 @@ public partial class FormCheckoutBranch : GitExtensionsDialog
             return DialogResult.Cancel;
         }
 
-        if (UICommands.StartCommandLineProcessDialog(owner, Commands.CheckoutBranch(branchName, isRemote, localChanges, newBranchMode, newBranchName)))
+        if (UICommands.StartCommandLineProcessDialog(owner.AsApiWindow(), Commands.CheckoutBranch(branchName, isRemote, localChanges, newBranchMode, newBranchName)))
         {
             if (stash)
             {

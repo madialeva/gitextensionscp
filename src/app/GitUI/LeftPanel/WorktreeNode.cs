@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using GitExtensions.Extensibility.Git;
 using GitUI.Properties;
 

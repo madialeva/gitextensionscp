@@ -104,7 +104,7 @@ public class CommitTemplateManagerTests
     public void RegisteredTemplates_should_be_store_IsRegex()
     {
         int count = _manager.RegisteredTemplates.Count();
-        _manager.Register("regexTest", () => "text1", icon: null, isRegex: true);
+        _manager.Register("regexTest", () => "text1", iconData: null, isRegex: true);
         _manager.RegisteredTemplates.ElementAt(count).IsRegex.Should().BeTrue();
     }
 
@@ -112,7 +112,7 @@ public class CommitTemplateManagerTests
     public void RegisteredTemplates_default_IsRegex_should_be_False()
     {
         int count = _manager.RegisteredTemplates.Count();
-        _manager.Register("regexTest2", () => "text1", icon: null);
+        _manager.Register("regexTest2", () => "text1", iconData: null);
         _manager.RegisteredTemplates.ElementAt(count).IsRegex.Should().BeFalse();
     }
 

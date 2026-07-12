@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using Git.hub;
 using GitCommands;
 using GitCommands.Config;
@@ -8,6 +8,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
 using GitExtensions.Extensibility.Settings;
 using GitExtensions.Plugins.GitHub3.Properties;
+using GitExtUtils;
 using GitUI;
 using GitUIPluginInterfaces;
 using GitUIPluginInterfaces.RepositoryHosts;
@@ -73,7 +74,6 @@ internal static class GitHubLoginInfo
 [Export(typeof(IGitPluginForCommit))]
 public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginForCommit
 {
-    private readonly TranslationString _viewInWebSite = new("View in {0}");
     private readonly TranslationString _tokenAlreadyExist = new("You already have an personal access token. To get a new one, delete your old one in Plugins > Plugin Settings first.");
     private readonly TranslationString _generateToken = new("Generate a GitHub personal access token");
     private readonly TranslationString _manageToken = new("Manage GitHub personal access token");
@@ -98,7 +98,6 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
     internal static GitHubRemoteParser _gitHubRemoteParser = new();
 
     private IGitUICommands? _currentGitUiCommands;
-    private IReadOnlyList<IHostedRemote>? _hostedRemotesForModule;
     private List<string> _currentMessages = [];
 
     public GitHub3Plugin() : base(true)
@@ -109,20 +108,15 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
 
         Instance ??= this;
 
-        Icon = Resources.IconGitHub;
+        SetIconFromEmbeddedPng("IconGitHub.png");
     }
 
     public override IEnumerable<ISetting> GetSettings()
     {
         yield return PersonalAccessToken;
 
-        LinkLabel generateTokenLink = new() { Text = _generateToken.Text };
-        generateTokenLink.Click += GenerateTokenLink_Click;
-        yield return new PseudoSetting(generateTokenLink);
-
-        LinkLabel manageTokenLink = new() { Text = _manageToken.Text };
-        manageTokenLink.Click += ManageTokenLink_Click;
-        yield return new PseudoSetting(manageTokenLink);
+        yield return new LinkSetting(_generateToken.Text, GenerateToken);
+        yield return new LinkSetting(_manageToken.Text, ManageToken);
 
         yield return new PseudoSetting(_noteRestartNeeded.Text);
 
@@ -131,12 +125,12 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
         yield return _issueCommitMessageHelperMaxCount;
     }
 
-    private void GenerateTokenLink_Click(object? sender, EventArgs e)
+    private void GenerateToken()
     {
         OpenLink($"https://{GitHubHost.ValueOrDefault(Instance.Settings)}/settings/tokens/new?description=Token%20for%20GitExtensions&scopes=repo,public_repo");
     }
 
-    private void ManageTokenLink_Click(object? sender, EventArgs e)
+    private void ManageToken()
     {
         OpenLink($"https://{GitHubHost.ValueOrDefault(Instance.Settings)}/settings/tokens");
     }
@@ -174,7 +168,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
 
         if (string.IsNullOrEmpty(GitHubLoginInfo.OAuthToken))
         {
-            e.GitUICommands.AddCommitTemplate(_noTokenError.Text, () => string.Empty, Icon);
+            e.GitUICommands.AddCommitTemplate(_noTokenError.Text, () => string.Empty, IconData);
             return;
         }
 
@@ -191,7 +185,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
             if (issues?.All(i => i.Number == 0) ?? true)
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                e.GitUICommands.AddCommitTemplate(_noAssignedIssues.Text, () => string.Empty, Icon);
+                e.GitUICommands.AddCommitTemplate(_noAssignedIssues.Text, () => string.Empty, IconData);
                 return;
             }
 
@@ -206,7 +200,7 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
                 string remoteData = multipleRemotes ? $" ({issue.Repository.Owner.Login}/{issue.Repository.Name})" : string.Empty;
                 string key = $"{issue.Number}: {issue.Title}{remoteData}";
                 _currentMessages.Add(key);
-                e.GitUICommands.AddCommitTemplate(key, () => GetIssueDescription(issue), Icon);
+                e.GitUICommands.AddCommitTemplate(key, () => GetIssueDescription(issue), IconData);
             }
 
             static string GetIssueDescription(Issue issue)
@@ -338,47 +332,6 @@ public class GitHub3Plugin : GitPluginBase, IRepositoryHostPlugin, IGitPluginFor
                     yield return hostedRemote;
                 }
             }
-        }
-    }
-
-    public void ConfigureContextMenu(ContextMenuStrip contextMenu)
-    {
-        const string HostedRemoteMenuItem = "HostedRemoteMenuItem";
-
-        for (int i = contextMenu.Items.Count - 1; i >= 0; i--)
-        {
-            ToolStripItem item = contextMenu.Items[i];
-            if (item is ToolStripMenuItem tsmi && tsmi.Tag as string == HostedRemoteMenuItem)
-            {
-                contextMenu.Items.RemoveAt(i);
-            }
-        }
-
-        _hostedRemotesForModule = GetHostedRemotesForModule();
-        if (_hostedRemotesForModule.Count == 0)
-        {
-            return;
-        }
-
-        ToolStripMenuItem toolStripMenuItem = new(string.Format(_viewInWebSite.Text, Name), Icon)
-        {
-            Tag = HostedRemoteMenuItem
-        };
-        contextMenu.Items.Add(toolStripMenuItem);
-
-        foreach (IHostedRemote hostedRemote in _hostedRemotesForModule.OrderBy(r => r.Data))
-        {
-            ToolStripItem toolStripItem = toolStripMenuItem.DropDownItems.Add(hostedRemote.DisplayData);
-            toolStripItem.Click += (s, e) =>
-            {
-                if (contextMenu.Tag is GitBlameContext blameContext)
-                {
-                    OsShellUtil.OpenUrlInDefaultBrowser(hostedRemote.GetBlameUrl(
-                            blameContext.BlameId.ToString(),
-                            blameContext.FileName,
-                            blameContext.LineIndex + 1));
-                }
-            };
         }
     }
 }

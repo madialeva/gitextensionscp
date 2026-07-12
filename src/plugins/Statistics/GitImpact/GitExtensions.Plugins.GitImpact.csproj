@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\app\GitExtUtils\GitExtUtils.csproj">
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconGitImpact.png" />
+    <EmbeddedResource Include="Resources\IconGitImpact.png" />
   </ItemGroup>
 
   <ItemGroup>

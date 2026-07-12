@@ -39,7 +39,7 @@ internal partial class FailedPluginWrapper : IGitPlugin
     public Guid Id { get; } = Guid.NewGuid();
     public string? Name { get; init; } = TranslatedStrings.FailedToLoadPlugin;
     public string? Description { get; } = TranslatedStrings.FailedToLoadPlugin;
-    public Image? Icon { get; } = Resources.bug;
+    public byte[]? IconData { get; } = Resources.bug.ToPngBytes();
     public IGitPluginSettingsContainer? SettingsContainer { get; set; }
     public bool HasSettings { get; } = false;
 

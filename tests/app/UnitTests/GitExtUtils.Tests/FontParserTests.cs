@@ -1,6 +1,6 @@
-﻿using GitExtensions.Extensibility;
+﻿using GitExtUtils;
 
-namespace GitUIPluginInterfacesTests;
+namespace GitExtUtilsTests;
 public class FontParserTests
 {
     private Font _defaultFont = null!;

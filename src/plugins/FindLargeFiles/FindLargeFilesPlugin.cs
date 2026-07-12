@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -15,7 +15,7 @@ public class FindLargeFilesPlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("5AE20AB1-D677-46C5-ABDB-7874FF5A9296");
         Name = "Find large files";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconFindLargeFiles;
+        SetIconFromEmbeddedPng("IconFindLargeFiles.png");
     }
 
     private readonly NumberSetting<float> _sizeLargeFile = new("Find large files bigger than (Mb)", 1);
@@ -29,7 +29,7 @@ public class FindLargeFilesPlugin : GitPluginBase, IGitPluginForRepository
     public override bool Execute(GitUIEventArgs args)
     {
         using FindLargeFilesForm frm = new(_sizeLargeFile.ValueOrDefault(Settings), args.GitUICommands);
-        frm.ShowDialog(args.OwnerForm);
+        frm.ShowDialog(args.OwnerForm as IWin32Window);
 
         return true;
     }

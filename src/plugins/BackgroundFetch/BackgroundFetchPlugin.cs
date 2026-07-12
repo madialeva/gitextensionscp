@@ -20,17 +20,13 @@ public class BackgroundFetchPlugin : GitPluginBase, IGitPluginForRepository
         Id = new Guid("D19A7905-8AAD-4271-ACA9-817669B94A1D");
         Name = "Periodic background fetch";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconBackgroundFetch;
+        SetIconFromEmbeddedPng("IconBackgroundFetch.png");
     }
 
     private IDisposable? _cancellationToken;
     private IGitUICommands? _currentGitUiCommands;
 
-    private readonly PseudoSetting _warningForceWithLease = new("WARNING: be careful when force push with lease having the periodic background fetch enabled but chose not to auto-refresh after each fetch.\r\n\r\nYou could lose new commits pushed by others to the remote branch.\r\n\r\nBe sure to refresh the revision grid before doing a force push with lease.", textboxSettings: tb =>
-    {
-        tb.Multiline = true;
-        tb.Height = 500;
-    });
+    private readonly PseudoSetting _warningForceWithLease = new("WARNING: be careful when force push with lease having the periodic background fetch enabled but chose not to auto-refresh after each fetch.\r\n\r\nYou could lose new commits pushed by others to the remote branch.\r\n\r\nBe sure to refresh the revision grid before doing a force push with lease.", height: 500);
     private const string _defaultGitCommand = "fetch --all";
     private readonly StringSetting _gitCommand = new("Arguments of git command to run", _defaultGitCommand);
     private readonly NumberSetting<int> _fetchInterval = new("Fetch every (seconds) - set to 0 to disable", 0);

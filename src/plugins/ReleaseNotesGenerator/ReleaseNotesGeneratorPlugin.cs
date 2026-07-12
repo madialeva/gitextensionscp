@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -14,13 +14,13 @@ public class ReleaseNotesGeneratorPlugin : GitPluginBase
         Id = new Guid("49E7F2D6-AD79-489E-80A4-5CD212AE6DF3");
         Name = "Release Notes Generator";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconReleaseNotesGenerator;
+        SetIconFromEmbeddedPng("IconReleaseNotesGenerator.png");
     }
 
     public override bool Execute(GitUIEventArgs args)
     {
         using ReleaseNotesGeneratorForm form = new(args);
-        if (form.ShowDialog(args.OwnerForm) == DialogResult.OK)
+        if (form.ShowDialog(args.OwnerForm as IWin32Window) == DialogResult.OK)
         {
             return true;
         }

@@ -117,12 +117,15 @@ public static class TranslationUtil
             yield break;
         }
 
+        // NOTE: WinForms types are detected by name via reflection on purpose: this assembly is
+        // UI-technology neutral and must not reference System.Windows.Forms. The whole
+        // translation pipeline gets replaced when the Avalonia shell arrives.
         Func<PropertyInfo, bool> isTranslatable;
-        if (item is DataGridViewColumn c)
+        if (IsWinFormsInstance(item, "DataGridViewColumn"))
         {
-            isTranslatable = property => IsTranslatableItemInDataGridViewColumn(property, c);
+            isTranslatable = property => IsTranslatableItemInDataGridViewColumn(property, item);
         }
-        else if (item is ComboBox || item is ListBox)
+        else if (IsWinFormsInstance(item, "ComboBox") || IsWinFormsInstance(item, "ListBox"))
         {
             isTranslatable = property => IsTranslatableItemInBox(property, item);
         }
@@ -141,9 +144,9 @@ public static class TranslationUtil
     {
         foreach ((string itemName, object itemObj) in items)
         {
-            if (itemObj is ToolTip tooltip)
+            if (IsWinFormsInstance(itemObj, "ToolTip"))
             {
-                string toolTipTitle = tooltip.ToolTipTitle;
+                string? toolTipTitle = GetToolTipTitle(itemObj);
 
                 if (!string.IsNullOrEmpty(toolTipTitle))
                 {
@@ -152,9 +155,9 @@ public static class TranslationUtil
 
                 foreach ((string itemNameForTooltip, object itemObjForTooltip) in items)
                 {
-                    if (itemObjForTooltip is Control control)
+                    if (IsWinFormsInstance(itemObjForTooltip, "Control"))
                     {
-                        string? tooltipString = tooltip.GetToolTip(control);
+                        string? tooltipString = GetToolTipFor(itemObj, itemObjForTooltip);
                         if (!string.IsNullOrEmpty(tooltipString))
                         {
                             // Will add an entry in the xlf file with id `NameOfControl.NameOfTooltipControl` ex: "PushToRemote.toolTip1"
@@ -215,7 +218,7 @@ public static class TranslationUtil
                 continue;
             }
 
-            if (itemObj is ToolTip tooltip)
+            if (IsWinFormsInstance(itemObj, "ToolTip"))
             {
                 static string? ProvideDefaultValue() => null;
 
@@ -223,18 +226,18 @@ public static class TranslationUtil
 
                 if (!string.IsNullOrEmpty(toolTipTitle))
                 {
-                    tooltip.ToolTipTitle = toolTipTitle;
+                    SetToolTipTitle(itemObj, toolTipTitle);
                 }
 
                 foreach ((string itemNameForTooltip, object itemObjForTooltip) in items)
                 {
-                    if (itemObjForTooltip is Control control)
+                    if (IsWinFormsInstance(itemObjForTooltip, "Control"))
                     {
                         string? tooltipString = translation.TranslateItem(category, itemNameForTooltip, itemName, ProvideDefaultValue);
 
                         if (!string.IsNullOrEmpty(tooltipString))
                         {
-                            tooltip.SetToolTip(control, tooltipString);
+                            SetToolTipFor(itemObj, itemObjForTooltip, tooltipString);
                         }
                     }
                 }
@@ -322,10 +325,42 @@ public static class TranslationUtil
         TranslateItemsFromList(category, translation, GetObjFields(obj, "$this"));
     }
 
-    private static bool IsTranslatableItemInDataGridViewColumn(PropertyInfo propertyInfo, DataGridViewColumn viewCol)
+    private static bool IsTranslatableItemInDataGridViewColumn(PropertyInfo propertyInfo, object viewCol)
     {
-        return propertyInfo.Name.Equals("HeaderText", StringComparison.CurrentCulture) && viewCol.Visible;
+        return propertyInfo.Name.Equals("HeaderText", StringComparison.CurrentCulture) &&
+               viewCol.GetType().GetProperty("Visible")?.GetValue(viewCol) is true;
     }
+
+    /// <summary>
+    ///  Determines by reflection whether <paramref name="item"/> derives from the WinForms type
+    ///  named <paramref name="typeName"/>. This assembly is UI-technology neutral and must not
+    ///  reference System.Windows.Forms; the translation engine still understands WinForms
+    ///  control trees at runtime until the pipeline is replaced (Avalonia shell, phase 4).
+    /// </summary>
+    private static bool IsWinFormsInstance(object? item, string typeName)
+    {
+        for (Type? type = item?.GetType(); type is not null; type = type.BaseType)
+        {
+            if (type.Name == typeName && type.Namespace == "System.Windows.Forms")
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static string? GetToolTipTitle(object toolTip)
+        => toolTip.GetType().GetProperty("ToolTipTitle")?.GetValue(toolTip) as string;
+
+    private static void SetToolTipTitle(object toolTip, string title)
+        => toolTip.GetType().GetProperty("ToolTipTitle")?.SetValue(toolTip, title);
+
+    private static string? GetToolTipFor(object toolTip, object control)
+        => toolTip.GetType().GetMethod("GetToolTip")?.Invoke(toolTip, [control]) as string;
+
+    private static void SetToolTipFor(object toolTip, object control, string text)
+        => toolTip.GetType().GetMethod("SetToolTip")?.Invoke(toolTip, [control, text]);
 
     private static bool IsTranslatableItemInBox(PropertyInfo property, object itemObj)
     {
