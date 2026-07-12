@@ -86,10 +86,13 @@
 
 ## 4. Cierre
 
-- [ ] 4.1 Smoke test manual de las zonas sensibles: arrancar app → cambiar tema claro/oscuro
+- [x] 4.1 Smoke test manual de las zonas sensibles: arrancar app → cambiar tema claro/oscuro
       → comprobar escalado DPI (si hay monitor a mano) → copiar commits al portapapeles desde
       la parrilla → abrir settings de un plugin (theming de controles)
-- [ ] 4.2 README breve en `src/app/GitExtUtils.WinForms/` explicando qué es el proyecto y por
+      → superado (2026-07-12): theming claro/oscuro OK, portapapeles OK, pintado de pestañas
+      OK, sin anomalías visuales
+- [x] 4.2 README breve en `src/app/GitExtUtils.WinForms/` explicando qué es el proyecto y por
       qué los namespaces no coinciden con el ensamblado (decisión D2)
-- [ ] 4.3 Actualizar la hoja de ruta (0.3 completado) y el registro de decisiones interno con
+- [x] 4.3 Actualizar la hoja de ruta (0.3 completado) y el registro de decisiones interno con
       las decisiones tomadas durante la implementación
+      → hoja de ruta y registro de decisiones internos actualizados (2026-07-12)
