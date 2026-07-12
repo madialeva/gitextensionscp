@@ -1,4 +1,5 @@
-﻿using GitExtensions.Extensibility.Git;
+﻿using System.Drawing;
+using GitExtensions.Extensibility.Git;
 using GitUIPluginInterfaces;
 
 namespace GitExtensions.Extensibility;

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using System.Text;
 using GitCommands;
 using GitExtensions.Extensibility;
@@ -6,6 +6,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
 using GitExtensions.Extensibility.Settings;
 using GitExtensions.Plugins.AutoCompileSubmodules.Properties;
+using GitExtUtils;
 using ResourceManager;
 
 namespace GitExtensions.Plugins.AutoCompileSubmodules;
@@ -23,7 +24,7 @@ public class AutoCompileSubModulesPlugin : GitPluginBase, IGitPluginForRepositor
         Id = new Guid("D4D1ACB7-0B6B-4A3C-B0DB-A25056A277D9");
         Name = "Auto compile submodules";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconAutoCompileSubmodules;
+        SetIconFromEmbeddedPng("IconAutoCompileSubmodules.png");
     }
 
     private readonly BoolSetting _msBuildEnabled = new("Enabled", false);

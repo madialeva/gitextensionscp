@@ -50,6 +50,7 @@ public sealed partial class BlameControl : GitModuleControl
     private static readonly Color[] AgeBucketGradientColors = GetAgeBucketGradientColors();
     private static readonly TranslationString _blameActualPreviousRevision = new("&Blame previous revision");
     private static readonly TranslationString _blameVisiblePreviousRevision = new("&Blame previous visible revision");
+    private static readonly TranslationString _viewInWebSite = new("View in {0}");
     private readonly Color _commitHighlightColor;
     private readonly IGitRevisionSummaryBuilder _gitRevisionSummaryBuilder;
     private readonly IGitBlameParser _gitBlameParser;
@@ -96,7 +97,52 @@ public sealed partial class BlameControl : GitModuleControl
     public void ConfigureRepositoryHostPlugin(IRepositoryHostPlugin? gitHoster)
     {
         _gitHoster = gitHoster;
-        _gitHoster?.ConfigureContextMenu(contextMenu);
+        AddViewInHostedRemoteMenuItems();
+    }
+
+    private void AddViewInHostedRemoteMenuItems()
+    {
+        const string HostedRemoteMenuItem = "HostedRemoteMenuItem";
+
+        for (int i = contextMenu.Items.Count - 1; i >= 0; i--)
+        {
+            if (contextMenu.Items[i] is ToolStripMenuItem tsmi && tsmi.Tag as string == HostedRemoteMenuItem)
+            {
+                contextMenu.Items.RemoveAt(i);
+            }
+        }
+
+        if (_gitHoster is null)
+        {
+            return;
+        }
+
+        IReadOnlyList<IHostedRemote> hostedRemotes = _gitHoster.GetHostedRemotesForModule();
+        if (hostedRemotes.Count == 0)
+        {
+            return;
+        }
+
+        ToolStripMenuItem viewInWebSiteMenuItem = new(string.Format(_viewInWebSite.Text, _gitHoster.Name), _gitHoster.IconData.ToImage())
+        {
+            Tag = HostedRemoteMenuItem
+        };
+        contextMenu.Items.Add(viewInWebSiteMenuItem);
+
+        foreach (IHostedRemote hostedRemote in hostedRemotes.OrderBy(r => r.Data))
+        {
+            ToolStripItem toolStripItem = viewInWebSiteMenuItem.DropDownItems.Add(hostedRemote.DisplayData);
+            toolStripItem.Click += (s, e) =>
+            {
+                if (contextMenu.Tag is GitBlameContext blameContext)
+                {
+                    OsShellUtil.OpenUrlInDefaultBrowser(hostedRemote.GetBlameUrl(
+                            blameContext.BlameId.ToString(),
+                            blameContext.FileName,
+                            blameContext.LineIndex + 1));
+                }
+            };
+        }
     }
 
     public void UpdateShowLineNumbers()

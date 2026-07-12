@@ -1,4 +1,6 @@
-﻿namespace GitExtensions.Extensibility.Settings;
+using GitExtensions.Extensibility.Settings;
+
+namespace GitUI.SettingControlBindings;
 
 public abstract class SettingControlBinding<TSetting, TControl> : ISettingControlBinding where TControl : Control where TSetting : ISetting
 {

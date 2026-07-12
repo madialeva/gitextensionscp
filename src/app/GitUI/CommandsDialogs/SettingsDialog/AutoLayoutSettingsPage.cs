@@ -1,5 +1,7 @@
-﻿using GitExtensions.Extensibility.Settings;
+using GitExtensions.Extensibility.Settings;
 using GitExtUtils.GitUI;
+
+using GitUI.SettingControlBindings;
 
 namespace GitUI.CommandsDialogs.SettingsDialog;
 

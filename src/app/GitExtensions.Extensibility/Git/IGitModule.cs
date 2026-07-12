@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Text;
 using GitExtensions.Extensibility.Configurations;
 using GitExtensions.Extensibility.Settings;

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using GitCommands;
 using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
@@ -167,7 +167,7 @@ partial class ScriptsManager
                     {
                         if (string.Equals(plugin.Name, command, StringComparison.CurrentCultureIgnoreCase))
                         {
-                            GitUIEventArgs eventArgs = new(owner, uiCommands);
+                            GitUIEventArgs eventArgs = new(owner.AsApiWindow(), uiCommands);
                             if (plugin.Execute(eventArgs))
                             {
                                 uiCommands.RepoChangedNotifier.Notify();

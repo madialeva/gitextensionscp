@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Settings;
+using GitExtUtils;
 using GitExtUtils.GitUI.Theming;
 using GitUIPluginInterfaces.BuildServerIntegration;
 using ResourceManager;

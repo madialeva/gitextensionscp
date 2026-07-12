@@ -1,4 +1,5 @@
-﻿using GitExtensions.Extensibility.Git;
+﻿using GitExtensions.Extensibility;
+using GitExtensions.Extensibility.Git;
 using GitUI.LeftPanel.Interfaces;
 using Microsoft;
 
@@ -45,9 +46,9 @@ internal abstract class Node : NodeBase, INode
         }
     }
 
-    protected IWin32Window? ParentWindow()
+    protected IWindow? ParentWindow()
     {
-        return TreeViewNode.TreeView?.FindForm();
+        return TreeViewNode.TreeView?.FindForm() as IWindow;
     }
 
     protected virtual string DisplayText()
