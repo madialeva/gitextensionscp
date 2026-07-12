@@ -14,16 +14,14 @@ name: Fork CI
 # `on:` — los TRIGGERS: qué eventos de GitHub arrancan este workflow.
 # -----------------------------------------------------------------------------
 on:
-  # Cada push a la rama de trabajo (p. ej. al mergear una PR).
-  # `paths-ignore`: si TODOS los ficheros del push están en las rutas ignoradas
+  # Solo pull requests CUYO DESTINO sea avalonia/main (sin trigger `push`: el
+  # merge de una PR ya validada no re-verifica, y los push directos a la rama
+  # —documentación, archivado de changes— tampoco gastan un run). El run de la
+  # PR se ejecuta sobre el resultado provisional del merge y se re-ejecuta con
+  # cada push a la rama de la PR, así el check verde/rojo siempre refleja el
+  # último estado.
+  # `paths-ignore`: si TODOS los ficheros cambiados están en las rutas ignoradas
   # (documentación OpenSpec), no se lanza el run — no hay nada que compilar.
-  push:
-    branches: [ avalonia/main ]
-    paths-ignore:
-      - 'openspec/**'
-  # Cada pull request CUYO DESTINO sea avalonia/main. Se ejecuta sobre el
-  # resultado provisional del merge, y se re-ejecuta con cada push a la rama
-  # de la PR — así el check verde/rojo de la PR siempre refleja el último estado.
   pull_request:
     branches: [ avalonia/main ]
     paths-ignore:
