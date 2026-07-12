@@ -1,4 +1,4 @@
-using GitCommands;
+﻿using GitCommands;
 using GitCommands.Git;
 using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
@@ -116,7 +116,7 @@ public sealed partial class FormDeleteBranch : GitExtensionsDialog
         }
 
         IGitCommand cmd = Commands.DeleteBranch(selectedBranches, force: true);
-        bool success = UICommands.StartCommandLineProcessDialog(Owner, cmd);
+        bool success = UICommands.StartCommandLineProcessDialog(Owner.AsApiWindow(), cmd);
         if (success)
         {
             Close();
@@ -153,7 +153,7 @@ public sealed partial class FormDeleteBranch : GitExtensionsDialog
         // so they no longer block branch deletion.
         if (classification.HasDeletedWorktrees)
         {
-            UICommands.StartCommandLineProcessDialog(Owner, command: null, "worktree prune");
+            UICommands.StartCommandLineProcessDialog(Owner.AsApiWindow(), command: null, "worktree prune");
         }
 
         HashSet<string> excludedBranches = [];
@@ -210,7 +210,7 @@ public sealed partial class FormDeleteBranch : GitExtensionsDialog
 
                 if (anyDeleted)
                 {
-                    UICommands.StartCommandLineProcessDialog(Owner, command: null, "worktree prune");
+                    UICommands.StartCommandLineProcessDialog(Owner.AsApiWindow(), command: null, "worktree prune");
                 }
             }
             else

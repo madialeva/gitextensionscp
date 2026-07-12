@@ -410,7 +410,7 @@ public sealed partial class FormPull : GitExtensionsDialog
 
             if (result == btnCheckout)
             {
-                if (!UICommands.StartCheckoutBranch(owner))
+                if (!UICommands.StartCheckoutBranch(owner.AsApiWindow()))
                 {
                     return DialogResult.Cancel;
                 }
@@ -458,7 +458,7 @@ public sealed partial class FormPull : GitExtensionsDialog
                 {
                     if (!InitModules())
                     {
-                        UICommands.UpdateSubmodules(owner);
+                        UICommands.UpdateSubmodules(owner.AsApiWindow());
                     }
                 }
                 else
@@ -558,7 +558,7 @@ public sealed partial class FormPull : GitExtensionsDialog
             // Rebase failed -> special 'rebase' merge conflict
             if (Rebase.Checked && Module.InTheMiddleOfRebase())
             {
-                return UICommands.StartTheContinueRebaseDialog(owner);
+                return UICommands.StartTheContinueRebaseDialog(owner.AsApiWindow());
             }
             else if (Module.InTheMiddleOfAction())
             {
@@ -601,7 +601,7 @@ public sealed partial class FormPull : GitExtensionsDialog
 
             if ((bool)messageBoxResult)
             {
-                UICommands.StashPop(owner);
+                UICommands.StashPop(owner.AsApiWindow());
             }
         }
 
@@ -668,7 +668,7 @@ public sealed partial class FormPull : GitExtensionsDialog
         if (!Fetch.Checked && AutoStash.Checked && !Module.IsBareRepository() &&
             Module.GitStatus(UntrackedFilesMode.No, IgnoreSubmodulesMode.All).Count > 0)
         {
-            UICommands.StashSave(owner, AppSettings.IncludeUntrackedFilesInAutoStash);
+            UICommands.StashSave(owner.AsApiWindow(), AppSettings.IncludeUntrackedFilesInAutoStash);
             return true;
         }
 

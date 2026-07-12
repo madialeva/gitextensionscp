@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Composition;
+using System.ComponentModel.Composition;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtensions.Extensibility.Plugins;
@@ -20,7 +20,7 @@ public class ProxySwitcherPlugin : GitPluginBase
         Id = new Guid("C2A1C7A4-D519-4BD1-859B-6CE7DB9325FB");
         Name = "Proxy Switcher";
         Translate(AppSettings.CurrentTranslation);
-        Icon = Resources.IconProxySwitcher;
+        SetIconFromEmbeddedPng("IconProxySwitcher.png");
     }
 
     public override IEnumerable<ISetting> GetSettings()
@@ -34,7 +34,7 @@ public class ProxySwitcherPlugin : GitPluginBase
     public override bool Execute(GitUIEventArgs args)
     {
         using ProxySwitcherForm form = new(this, Settings, args);
-        form.ShowDialog(args.OwnerForm);
+        form.ShowDialog(args.OwnerForm as IWin32Window);
 
         return false;
     }

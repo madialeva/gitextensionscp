@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <Compile Include="..\..\app\GitExtUtils\Validates.cs" Link="Validates.cs" />
@@ -32,7 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\loadingpanel.gif" />
-    <None Include="Resources\IconDeleteUnusedBranches.png" />
+    <EmbeddedResource Include="Resources\IconDeleteUnusedBranches.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

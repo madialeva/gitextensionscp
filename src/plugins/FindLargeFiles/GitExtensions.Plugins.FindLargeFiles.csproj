@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\..\app\GitCommands\GitCommands.csproj">
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Resources\IconFindLargeFiles.png" />
+    <EmbeddedResource Include="Resources\IconFindLargeFiles.png" />
   </ItemGroup>
 
   <ItemGroup>

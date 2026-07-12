@@ -477,7 +477,7 @@ public partial class FormPush : GitModuleForm
             {
                 if (PluginRegistry.TryGetGitHosterForModule(Module) is not null)
                 {
-                    UICommands.StartCreatePullRequest(owner);
+                    UICommands.StartCreatePullRequest(owner.AsApiWindow());
                 }
                 else
                 {

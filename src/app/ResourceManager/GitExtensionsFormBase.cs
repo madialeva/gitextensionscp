@@ -22,7 +22,7 @@ namespace ResourceManager;
 /// Deriving from this class requires a call to <see cref="InitializeComplete"/> at
 /// the end of the constructor. Omitting this call with result in a runtime exception.
 /// </remarks>
-public class GitExtensionsFormBase : Form, ITranslate
+public class GitExtensionsFormBase : Form, ITranslate, IWindow
 {
     private readonly GitExtensionsControlInitialiser _initialiser;
     private IReadOnlyList<HotkeyCommand>? _hotkeys;

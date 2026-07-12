@@ -200,6 +200,9 @@ public class StringComboBoxAdapter : ChoiceSetting
     public StringComboBoxAdapter(ISetting<string> setting, ComboBox comboBox)
         : base(setting.FullPath, [.. comboBox.Items.Cast<string>()], setting.Default)
     {
-        CustomControl = comboBox;
+        ComboBox = comboBox;
     }
+
+    /// <summary>Pre-existing designer combo box this adapter binds to (GitUI-side only).</summary>
+    public ComboBox ComboBox { get; }
 }

@@ -878,7 +878,7 @@ public sealed partial class FormBrowse : GitModuleForm, IBrowseRepo
                 ToolStripMenuItem item = new()
                 {
                     Text = plugin.Name,
-                    Image = plugin.Icon,
+                    Image = plugin.IconData.ToImage(),
                     Tag = plugin
                 };
                 item.Click += delegate

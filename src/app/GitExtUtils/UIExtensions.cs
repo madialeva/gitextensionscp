@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace GitExtensions.Extensibility.Extensions;
+namespace GitExtUtils;
 
 public static class UIExtensions
 {
