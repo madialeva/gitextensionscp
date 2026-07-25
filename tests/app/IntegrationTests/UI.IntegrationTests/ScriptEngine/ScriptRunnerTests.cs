@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Reflection;
+﻿using System.Reflection;
 using AwesomeAssertions.Specialized;
 using CommonTestUtils;
 using GitExtensions.Extensibility;
@@ -9,6 +8,7 @@ using GitUI;
 using GitUI.CommandsDialogs;
 using GitUI.ScriptsEngine;
 using GitUIPluginInterfaces;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using ResourceManager;
 
@@ -42,14 +42,14 @@ public class ScriptRunnerTests
         ScriptsManager scriptsManager = new();
         scriptsManager.GetScripts();
 
-        ServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
-        serviceContainer.RemoveService<IScriptsManager>();
-        serviceContainer.RemoveService<IScriptsRunner>();
-        serviceContainer.AddService<IScriptsManager>(scriptsManager);
-        serviceContainer.AddService<IScriptsRunner>(scriptsManager);
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider(services =>
+        {
+            services.AddSingleton<IScriptsManager>(scriptsManager);
+            services.AddSingleton<IScriptsRunner>(scriptsManager);
+        });
 
         _referenceRepository = new ReferenceRepository();
-        _uiCommands = new GitUICommands(serviceContainer, _referenceRepository.Module);
+        _uiCommands = new GitUICommands(serviceProvider, _referenceRepository.Module);
 
         _module = Substitute.For<IGitModule>();
         _module.GetCurrentRemote().ReturnsForAnyArgs("origin");

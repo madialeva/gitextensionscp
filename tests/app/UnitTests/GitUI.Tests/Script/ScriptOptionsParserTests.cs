@@ -1,4 +1,3 @@
-using System.ComponentModel.Design;
 using GitCommands;
 using GitCommands.Config;
 using GitCommands.Git;
@@ -9,6 +8,7 @@ using GitExtUtils;
 using GitUI;
 using GitUI.ScriptsEngine;
 using GitUIPluginInterfaces;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitUITests.Script;
@@ -341,10 +341,11 @@ public class ScriptOptionsParserTests
         IRepositoryDescriptionProvider repositoryDescriptionProvider = Substitute.For<IRepositoryDescriptionProvider>();
         repositoryDescriptionProvider.Get(Arg.Any<string>()).Returns(dirName);
 
-        ServiceContainer serviceContainer = new();
-        serviceContainer.AddService(repositoryDescriptionProvider);
+        ServiceCollection services = new();
+        services.AddSingleton(repositoryDescriptionProvider);
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-        _commands = new GitUICommands(serviceContainer, new GitModule(new GitExecutorProvider(new GitDirectoryResolver()), ""));
+        _commands = new GitUICommands(serviceProvider, new GitModule(new GitExecutorProvider(new GitDirectoryResolver()), ""));
 
         string? result = ScriptOptionsParser.GetTestAccessor().ParseScriptArguments(
             arguments: "{" + option + "}", option,

@@ -14,9 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AdysTech.CredentialManager" />
     <PackageReference Include="Ben.Demystifier" />
     <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
   </ItemGroup>
 
   <ItemGroup>

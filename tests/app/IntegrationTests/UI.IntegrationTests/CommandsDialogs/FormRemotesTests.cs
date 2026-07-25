@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.Design;
-using AwesomeAssertions;
+﻿using AwesomeAssertions;
 using CommonTestUtils;
 using GitCommands;
 using GitCommands.Git;
 using GitExtUtils;
 using GitUI;
 using GitUI.CommandsDialogs;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitExtensions.UITests.CommandsDialogs;
@@ -24,9 +24,9 @@ public class FormRemotesTests
 
         _referenceRepository = new ReferenceRepository();
 
-        ServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider();
 
-        _commands = new GitUICommands(serviceContainer, _referenceRepository.Module);
+        _commands = new GitUICommands(serviceProvider, _referenceRepository.Module);
     }
 
     [TearDown]
