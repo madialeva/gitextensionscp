@@ -36,5 +36,5 @@
 
 - [x] 5.1 Ejecutar `eng/Verify.ps1` completo — build + 15/15 suites de tests pasan
 - [x] 5.2 Ejecutar `eng/Verify-Linux.ps1` (simulado localmente) — el proyecto Avalonia compila en `net10.0`
-- [ ] 5.3 Confirmar que `fork-ci.yml` pasa en ambas plataformas (PR CI) — se validará en la PR
+- [x] 5.3 Confirmar que `fork-ci.yml` pasa en ambas plataformas (PR CI)
 - [x] 5.4 Grep final: `GitExtensions.Avalonia.csproj` no tiene `ProjectReference` a ensamblados WinForms
