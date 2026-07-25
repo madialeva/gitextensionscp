@@ -68,6 +68,6 @@
 ## 12. Verificación
 
 - [x] 12.1 Ejecutar `eng/Verify.ps1` — 15/15 suites pasan (build + unit tests)
-- [ ] 12.2 Ejecutar `eng/Verify-Linux.ps1` y confirmar Linux CI verde (pendiente de CI en el push)
-- [ ] 12.3 Smoke test manual: abrir la app WinForms, abrir un repositorio, navegar — verificar funcionalidad (pendiente del usuario)
+- [x] 12.2 Ejecutar `eng/Verify-Linux.ps1` y confirmar Linux CI verde — verificado en PR CI
+- [x] 12.3 Smoke test manual: abrir la app WinForms, abrir un repositorio, navegar — verificado por el usuario
 - [x] 12.4 Grep final: cero `new ServiceContainer()` en src/ y tests/; un solo `using System.ComponentModel.Design` residual en `ScriptsSettingsPage.ScriptInfoProxy.cs` (usa `UITypeEditor`/`IComponent`, no `ServiceContainer`)
