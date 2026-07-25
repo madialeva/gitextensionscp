@@ -1,3 +1,20 @@
+# License
+
+This project is a fork of [Git Extensions](https://github.com/gitextensions/gitextensions),
+originally created by Henk Westhuis and contributed to by
+[hundreds of developers](https://github.com/gitextensions/gitextensions/graphs/contributors)
+since 2008.
+
+The original code is licensed under the **GNU General Public License v3.0 (GPLv3)**. This
+fork retains the same license — as a derivative work of GPLv3-licensed software, it must be
+distributed under the same terms.
+
+New code added in this fork is also licensed under GPLv3.
+
+---
+
+The full text of the GNU General Public License v3.0 follows:
+
 GNU GENERAL PUBLIC LICENSE
 ==========================
 
@@ -594,3 +611,4 @@ more useful to permit linking proprietary applications with the library. If this
 what you want to do, use the GNU Lesser General Public License instead of this
 License. But first, please read
 &lt;<http://www.gnu.org/philosophy/why-not-lgpl.html>&gt;.
+
