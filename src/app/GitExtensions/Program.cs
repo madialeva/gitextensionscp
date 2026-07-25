@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Diagnostics;
 using GitCommands;
 using GitExtensions.Extensibility;
@@ -13,6 +12,7 @@ using GitUI.Infrastructure.Telemetry;
 using GitUI.NBugReports;
 using GitUI.Theming;
 using GitUIPluginInterfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Threading;
 using MessageBoxes = GitUI.MessageBoxes;
 
@@ -20,7 +20,16 @@ namespace GitExtensions;
 
 internal static class Program
 {
-    private static readonly ServiceContainer _serviceContainer = new();
+    private static readonly IServiceProvider _serviceProvider = CreateServiceProvider();
+
+    private static IServiceProvider CreateServiceProvider()
+    {
+        ServiceCollection services = new();
+        services.AddGitExtensions();
+        IServiceProvider provider = services.BuildServiceProvider();
+        GitUI.ServiceCollectionExtensions.WireTraceListener(provider);
+        return provider;
+    }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern bool SetProcessDPIAware();
@@ -61,8 +70,7 @@ internal static class Program
 
         Control.CheckForIllegalCrossThreadCalls = checkForIllegalCrossThreadCalls;
 
-        ServiceContainerRegistry.RegisterServices(_serviceContainer);
-        BugReportInvoker.ExecutorProvider = _serviceContainer.GetRequiredService<IGitExecutorProvider>();
+        BugReportInvoker.ExecutorProvider = _serviceProvider.GetRequiredService<IGitExecutorProvider>();
 
         // If an error happens before we had a chance to init the environment information
         // the call to GetInformation() from BugReporter.ShowNBug() will fail.
@@ -166,13 +174,13 @@ internal static class Program
                     }
                 }
 
-                GitUICommands uiCommands = new(_serviceContainer, new GitModule(_serviceContainer.GetRequiredService<IGitExecutorProvider>(), ""));
+                GitUICommands uiCommands = new(_serviceProvider, new GitModule(_serviceProvider.GetRequiredService<IGitExecutorProvider>(), ""));
                 CommonLogic commonLogic = new(uiCommands.Module);
                 if (AppSettings.CheckSettings)
                 {
                     CheckSettingsLogic checkSettingsLogic = new(commonLogic);
                     SettingsPageHostMock fakePageHost = new(checkSettingsLogic);
-                    using ChecklistSettingsPage checklistSettingsPage = SettingsPageBase.Create<ChecklistSettingsPage>(fakePageHost, _serviceContainer);
+                    using ChecklistSettingsPage checklistSettingsPage = SettingsPageBase.Create<ChecklistSettingsPage>(fakePageHost, _serviceProvider);
                     if (!checklistSettingsPage.CheckSettings())
                     {
                         if (!checkSettingsLogic.AutoSolveAllSettings() || !checklistSettingsPage.CheckSettings())
@@ -197,7 +205,7 @@ internal static class Program
             MouseWheelRedirector.Active = true;
         }
 
-        GitUICommands commands = new(_serviceContainer, new GitModule(_serviceContainer.GetRequiredService<IGitExecutorProvider>(), GetWorkingDir(args)));
+        GitUICommands commands = new(_serviceProvider, new GitModule(_serviceProvider.GetRequiredService<IGitExecutorProvider>(), GetWorkingDir(args)));
 
         if (args.Length <= 1)
         {

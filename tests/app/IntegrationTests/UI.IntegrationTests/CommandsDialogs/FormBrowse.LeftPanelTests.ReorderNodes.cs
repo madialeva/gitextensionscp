@@ -69,7 +69,7 @@ public class FormBrowse_LeftPanel_ReorderNodesTest
     {
         _repo1 = new GitModuleTestHelper("repo1");
 
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _repo1.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _repo1.Module);
     }
 
     [TearDown]

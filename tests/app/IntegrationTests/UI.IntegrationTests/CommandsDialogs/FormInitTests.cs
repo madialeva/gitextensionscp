@@ -17,7 +17,7 @@ public class FormInitTests
     public void SetUp()
     {
         _referenceRepository = new ReferenceRepository();
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _referenceRepository.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _referenceRepository.Module);
     }
 
     [TearDown]

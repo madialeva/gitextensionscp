@@ -55,7 +55,7 @@ public class FormBrowse_LeftPanelTests
         _referenceRepository.Module.AddRemote(RemoteName, _remoteReferenceRepository.Module.WorkingDir);
         _referenceRepository.Fetch(RemoteName);
 
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _referenceRepository.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _referenceRepository.Module);
 
         _referenceRepository.CreateCommit("Commit1", "Commit1");
         _referenceRepository.CreateBranch("Branch1", _referenceRepository.CommitHash!);

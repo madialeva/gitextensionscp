@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.ComponentModel.Design;
 using CommonTestUtils;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
@@ -11,6 +10,7 @@ using GitUI.Editor;
 using GitUI.ScriptsEngine;
 using GitUI.UserControls;
 using ICSharpCode.TextEditor;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitExtensions.UITests.CommandsDialogs;
@@ -33,14 +33,15 @@ public class FormCommitTests
     {
         _referenceRepository = new ReferenceRepository();
 
-        ServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
-        serviceContainer.RemoveService<IScriptsRunner>();
-
         IScriptsRunner scriptsRunner = Substitute.For<IScriptsRunner>();
         scriptsRunner.RunEventScripts(Arg.Any<ScriptEvent>(), Arg.Any<FormCommit>()).Returns(true);
-        serviceContainer.AddService(scriptsRunner);
 
-        _commands = new GitUICommands(serviceContainer, _referenceRepository.Module);
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider(services =>
+        {
+            services.AddSingleton(scriptsRunner);
+        });
+
+        _commands = new GitUICommands(serviceProvider, _referenceRepository.Module);
     }
 
     [TearDown]

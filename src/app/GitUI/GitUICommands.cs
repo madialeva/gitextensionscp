@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Text;
 using GitCommands;
@@ -18,6 +17,8 @@ using GitUI.HelperDialogs;
 using GitUIPluginInterfaces;
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace GitUI;
 
 /// <summary>Contains methods to invoke GitEx forms, dialogs, etc.</summary>
@@ -34,7 +35,7 @@ public sealed class GitUICommands : IGitUICommands
     private readonly IFullPathResolver _fullPathResolver;
     private readonly IFindFilePredicateProvider _findFilePredicateProvider;
 
-    public static IServiceProvider EmptyServiceProvider = new ServiceContainer();
+    public static IServiceProvider EmptyServiceProvider = new ServiceCollection().BuildServiceProvider();
 
     public IGitModule Module { get; private set; }
     public ILockableNotifier RepoChangedNotifier { get; }

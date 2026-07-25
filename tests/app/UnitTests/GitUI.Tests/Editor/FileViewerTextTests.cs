@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.Design;
-using CommonTestUtils;
+﻿using CommonTestUtils;
 using GitExtUtils;
 using GitUI;
 using GitUI.Editor;
 using GitUI.ScriptsEngine;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using ResourceManager;
 
@@ -15,18 +15,20 @@ namespace GitUITests.Editor;
 public class FileViewerTextTests
 {
     private IServiceProvider _serviceProvider = null!;
+    private ServiceProvider? _disposableProvider;
     private IGitUICommandsSource _uiCommandsSource = null!;
     private FileViewer _fileViewer = null!;
 
     [SetUp]
     public void SetUp()
     {
-        ServiceContainer serviceContainer = new();
+        ServiceCollection services = new();
         IScriptsManager scriptsManager = Substitute.For<IScriptsManager>();
         scriptsManager.GetScripts().Returns([]);
-        serviceContainer.AddService(scriptsManager);
-        serviceContainer.AddService(Substitute.For<IHotkeySettingsLoader>());
-        _serviceProvider = serviceContainer;
+        services.AddSingleton(scriptsManager);
+        services.AddSingleton(Substitute.For<IHotkeySettingsLoader>());
+        _disposableProvider = services.BuildServiceProvider();
+        _serviceProvider = _disposableProvider;
 
         _uiCommandsSource = Substitute.For<IGitUICommandsSource>();
         _fileViewer = new FileViewer();
@@ -35,6 +37,7 @@ public class FileViewerTextTests
     [TearDown]
     public void TearDown()
     {
+        _disposableProvider?.Dispose();
         _fileViewer.Dispose();
     }
 
