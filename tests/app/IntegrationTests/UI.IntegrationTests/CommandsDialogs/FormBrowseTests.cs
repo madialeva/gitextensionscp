@@ -46,7 +46,7 @@ public class FormBrowseTests
     {
         _referenceRepository = new ReferenceRepository();
 
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _referenceRepository.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _referenceRepository.Module);
     }
 
     [TearDown]
@@ -157,7 +157,7 @@ public class FormBrowseTests
     public void File_history_should_behave_as_expected(string fileRelativePath, string fileName)
     {
         using ReferenceRepository referenceRepository = new();
-        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceContainer(), referenceRepository.Module);
+        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceProvider(), referenceRepository.Module);
 
         string revision1 = referenceRepository.CreateCommitRelative(fileRelativePath, fileName, $"Create '{fileName}' in directory '{fileRelativePath}'");
         string revision2 = referenceRepository.CreateCommitRelative(fileRelativePath, fileName, $"Update '{fileName}' in directory '{fileRelativePath}'");
@@ -198,7 +198,7 @@ public class FormBrowseTests
         const string contentB = nameof(contentB);
 
         using ReferenceRepository referenceRepository = new();
-        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceContainer(), referenceRepository.Module);
+        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceProvider(), referenceRepository.Module);
         referenceRepository.CreateCommit("multiple files",
             $"{contentA}\n{new string('A', 20000)}", fileA,
             $"{contentB}\n{new string('B', 20000)}", fileB);
@@ -250,7 +250,7 @@ public class FormBrowseTests
     public void ShowStashes_starting_disabled_should_filter_as_expected()
     {
         using ReferenceRepository referenceRepository = new();
-        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceContainer(), referenceRepository.Module);
+        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceProvider(), referenceRepository.Module);
 
         referenceRepository.CreateCommit("Commit1");
         referenceRepository.Stash("Stash1");
@@ -297,7 +297,7 @@ public class FormBrowseTests
     public void ShowStashes_starting_enabled_should_filter_as_expected()
     {
         using ReferenceRepository referenceRepository = new();
-        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceContainer(), referenceRepository.Module);
+        GitUICommands commands = new(GlobalServiceContainer.CreateDefaultMockServiceProvider(), referenceRepository.Module);
 
         referenceRepository.CreateCommit("Commit1");
         referenceRepository.Stash("Stash1");

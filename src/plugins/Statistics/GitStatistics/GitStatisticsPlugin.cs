@@ -5,6 +5,7 @@ using GitExtensions.Extensibility.Plugins;
 using GitExtensions.Extensibility.Settings;
 using GitExtensions.Plugins.GitStatistics.Properties;
 using GitExtUtils;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GitExtensions.Plugins.GitStatistics;
 
