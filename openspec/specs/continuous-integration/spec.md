@@ -4,7 +4,7 @@
 Verificación automática del fork en GitHub Actions: cada push/PR a `avalonia/main` ejecuta
 la misma verificación que en local (`eng/Verify.ps1` en Windows, `eng/Verify-Linux.ps1` en
 Linux), sobre máquina limpia. Establecida por el change 0.1 (`add-fork-ci`); ampliada con
-pata Linux en el change 0.4 (`canary-multiplatform`).
+pata Linux en el change 0.4 (`canary-multiplatform`); ampliada con el proyecto Avalonia en el change 1.1a (`hello-avalonia`).
 
 ## Requirements
 ### Requirement: Verificación automática de avalonia/main (Windows)
@@ -30,6 +30,10 @@ propia de compilación o selección de tests.
 - **WHEN** `eng/Verify.ps1` pasa en una máquina local limpia con submódulos inicializados
 - **THEN** el mismo commit pasa en el job `verify-windows`
 
+#### Scenario: Paridad local/CI (Linux)
+- **WHEN** `eng/Verify-Linux.ps1` pasa en una máquina local limpia con submódulos inicializados
+- **THEN** el mismo commit pasa en el job `verify-linux`
+
 ### Requirement: Diagnóstico de fallos descargable
 El workflow SHALL publicar como artifact los resultados `.trx` de los tests cuando la
 verificación falle.
@@ -40,13 +44,18 @@ verificación falle.
 
 ### Requirement: Verificación en Linux (canary multiplataforma)
 El workflow SHALL contener un job `verify-linux` que ejecute `eng/Verify-Linux.ps1` en un
-runner `ubuntu-latest`: compilación de los cuatro ensamblados core (`net10.0`) y ejecución
-del subset `net10.0` de `GitCommands.Tests`.
+runner `ubuntu-latest`: compilación de los ensamblados core multiplataforma (`net10.0`),
+incluyendo el nuevo proyecto `GitExtensions.Avalonia`, y ejecución del subset `net10.0` de
+`GitCommands.Tests`.
 
 #### Scenario: PR activa ambos jobs
 - **WHEN** se abre una PR contra `avalonia/main` con cambios fuera de `openspec/`
 - **THEN** GitHub Actions arranca `verify-windows` y `verify-linux` en paralelo, y ambos
   deben pasar para que el check de la PR aparezca verde
+
+#### Scenario: Job Linux compila el proyecto Avalonia
+- **WHEN** se ejecuta el job `verify-linux`
+- **THEN** `GitExtensions.Avalonia.csproj` se compila exitosamente en el runner Linux
 
 #### Scenario: Job Linux publica artifacts al fallar
 - **WHEN** el job `verify-linux` falla
@@ -59,3 +68,18 @@ nuevo push a esa misma rama.
 #### Scenario: Dos pushes consecutivos
 - **WHEN** se hace push a `avalonia/main` mientras el run del push anterior sigue en curso
 - **THEN** el run anterior se cancela y solo el nuevo llega a completarse
+
+### Requirement: Script Verify-Linux.ps1 compila el proyecto Avalonia
+El script `eng/Verify-Linux.ps1` SHALL incluir
+`src/app/GitExtensions.Avalonia/GitExtensions.Avalonia.csproj` en su lista de proyectos
+core a compilar.
+
+#### Scenario: Proyecto Avalonia en lista de coreProjects
+- **WHEN** se inspecciona `eng/Verify-Linux.ps1`
+- **THEN** la variable `$coreProjects` contiene la ruta
+  `src/app/GitExtensions.Avalonia/GitExtensions.Avalonia.csproj`
+
+#### Scenario: Fallo de build detiene el script
+- **WHEN** la compilación de `GitExtensions.Avalonia.csproj` falla en Linux
+- **THEN** el script termina con código de error distinto de cero y muestra
+  "VERIFY-LINUX FAILED"
