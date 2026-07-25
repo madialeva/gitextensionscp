@@ -89,17 +89,21 @@
       - Nuevo job `verify-linux`: `ubuntu-latest`, checkout + setup-dotnet + `pwsh -File
         eng/Verify-Linux.ps1`, artifact propio.
       - Ambos jobs corren en los mismos triggers (PR/push a avalonia/main, workflow_dispatch).
-- [ ] 5.3 Push a la rama del change y verificar que la PR activa ambos jobs y ambos pasan
+- [x] 5.3 Push a la rama del change y verificar que la PR activa ambos jobs y ambos pasan
   en verde (Windows con la solución completa, Linux con el subset `net10.0` + tests de
   `GitCommands`).
+  → PR #8 mergeada con CI verde en ambos jobs (Windows 15/15, Linux core + GitCommands.Tests).
 
 ## 6. Cierre
 
-- [ ] 6.1 Actualizar los specs baseline en `openspec/specs/`: el spec `core-dependencies` deja
+- [x] 6.1 Actualizar los specs baseline en `openspec/specs/`: el spec `core-dependencies` deja
   de mencionar "compila con `UseWindowsForms=false` en Windows" y pasa a "compila y pasa tests
   en Linux con `TargetFramework=net10.0`"; `continuous-integration` gana el requisito del job
   Linux.
-- [ ] 6.2 Actualizar `AGENTS.md` y `AVALONIA_MIGRATION_ANALYSIS.md` §10 con las decisiones
+  → Los tres specs (core-dependencies, continuous-integration, cross-platform-core)
+  actualizados en el baseline. Commiteado en avalonia/main.
+- [x] 6.2 Actualizar `AGENTS.md` y `AVALONIA_MIGRATION_ANALYSIS.md` §10 con las decisiones
   tomadas durante la implementación y marcar 0.4 como completado.
-- [ ] 6.3 Verificar que el README del repo (si procede) refleja que la Fase 0 está completa
+- [x] 6.3 Verificar que el README del repo (si procede) refleja que la Fase 0 está completa
   (core multiplataforma verificado en CI).
+  → README actualizado con tabla de fases y checkmark en Fase 0.
