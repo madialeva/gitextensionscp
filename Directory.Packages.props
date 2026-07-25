@@ -3,8 +3,12 @@
   <ItemGroup>
     <!-- Solution dependencies -->
     <PackageVersion Include="AdysTech.CredentialManager" Version="2.3.0" />
+    <PackageVersion Include="Avalonia" Version="11.3.18" />
+    <PackageVersion Include="Avalonia.Desktop" Version="11.3.18" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="11.3.18" />
     <PackageVersion Include="AppInsights.WindowsDesktop" Version="2.18.1" />
     <PackageVersion Include="Ben.Demystifier" Version="0.4.1" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="ConEmu.Core" Version="23.07.24" />
     <PackageVersion Include="EnvDTE" Version="17.0.32112.339" />
     <PackageVersion Include="ExCSS" Version="4.1.3" />
