@@ -41,7 +41,8 @@ $coreProjects = @(
     'src\app\GitExtensions.Extensibility\GitExtensions.Extensibility.csproj',
     'src\app\GitExtUtils\GitExtUtils.csproj',
     'src\app\GitCommands\GitCommands.csproj',
-    'src\plugins\GitUIPluginInterfaces\GitUIPluginInterfaces.csproj'
+    'src\plugins\GitUIPluginInterfaces\GitUIPluginInterfaces.csproj',
+    'src\app\GitExtensions.Avalonia\GitExtensions.Avalonia.csproj'
 )
 
 # -------------------------------------------------------------------
