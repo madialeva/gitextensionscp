@@ -25,14 +25,15 @@ The journey started on **July 11, 2026**, from the upstream stable tag `v7.2.0`.
 
 [![Fork CI](https://github.com/angazo/gitextensionscp/actions/workflows/fork-ci.yml/badge.svg?event=pull_request)](https://github.com/angazo/gitextensionscp/actions/workflows/fork-ci.yml)
 
-🚧 **Early days.** The migration is being developed incrementally, phase by phase:
+The migration is developed incrementally, phase by phase:
 
-1. **Phase 0 — Foundations** ✅: decoupled the core from WinForms, retargeted to `net10.0`,
-   and proved it builds and passes tests on Linux in CI.
-2. **Phase 1 — Walking skeleton**: a minimal Avalonia app that opens a repository.
-3. **Phase 2 — Vertical slice**: commit graph and diff viewer (read-only browsing).
-4. **Phase 3 — Write operations**: commit, push/pull, branches…
-5. **Phase 4 — Platform & parity**: localization, settings, packaging per OS.
+| Phase | Description | Status |
+|-------|-------------|--------|
+| **0 — Foundations** | Decouple the core from WinForms and prove it builds and passes tests on Linux in CI | ✅ |
+| **1 — Walking skeleton** | A minimal Avalonia app that opens a repository | |
+| **2 — Vertical slice** | Commit graph and diff viewer (read-only browsing) | |
+| **3 — Write operations** | Commit, push/pull, branches, stash… | |
+| **4 — Platform & parity** | Localization, settings UI, packaging per OS | |
 
 ## Building
 
@@ -62,4 +63,5 @@ Icons by [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/)
 
 ## License
 
-Same license as the original project — see [LICENSE.md](LICENSE.md).
+This project is a fork of [Git Extensions](https://github.com/gitextensions/gitextensions) and
+retains its original license — [GNU General Public License v3.0](LICENSE.md).

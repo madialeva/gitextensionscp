@@ -1,76 +1,36 @@
-﻿# Contributing to Git Extensions
+﻿# Contributing to Git Extensions Cross Platform
 
-:exclamation: As of 23 January 2019 all submissions to this project must be done under [The Developer Certificate of Origin](contributors.txt). You must sign it with your pull request, if you've not done so before.
+This is an independent fork of Git Extensions, maintained as a solo project with AI-assisted
+development. The goal is migrating the UI from Windows Forms to Avalonia while keeping the
+original application buildable and usable as a functional reference.
 
-Git Extensions is a project with a long history, made possible by [hundreds of contributors](https://github.com/gitextensions/gitextensions/graphs/contributors).
+## Project model
 
-We welcome contributions including:
+- Development is tracked through [OpenSpec](openspec/) change proposals. Each change has a
+  `proposal.md`, `design.md`, `specs/` and `tasks.md` under `openspec/changes/`.
+- Implementation is assisted by AI agents that follow the specifications.
+- Pull requests are the primary mechanism for integrating changes into the `avalonia/main`
+  branch. CI (`fork-ci.yml`) validates every PR on Windows and Linux.
 
-- Ideas for improvements
-- Bug reports
-- Bug fixes
-- New features
+## How to contribute
 
-To help the project maintainers be as effective as possible, please follow the simple guidelines below.
+Contributions are welcome. If you'd like to propose a change:
 
-## Reporting Issues
+1. Open an issue describing what you want to do and why.
+2. If the change is non-trivial, draft an OpenSpec proposal (`proposal.md` + `design.md`).
+3. Implement the change on a feature branch and open a pull request against `avalonia/main`.
+4. PRs must pass CI (build + unit tests on Windows and Linux) and be reviewed before merging.
 
-[Search the issue tracker](https://github.com/gitextensions/gitextensions/issues?&q=) for an
-existing or closely related issue before creating a new one. Be sure to include closed issues
-in your search.
+## Code style
 
-If an open issue already exists, read through the discussion. If you can add something helpful, do so.
-Add a 👍 if you'd like to see it prioritized. Subscribe to the issue for updates.
+- Follow the existing conventions of the codebase (StyleCop analyzers are enforced at build
+  time).
+- Keep changes focused and minimal — one concern per PR.
+- Run `eng/Verify.ps1` locally before opening a PR to confirm the full Windows solution builds
+  and all unit tests pass.
 
-If a closed issue already exists and the issue was addressed, you may like to try one of the
-[CI builds](https://github.com/gitextensions/gitextensions/wiki/Canary-Builds).
+## Credits
 
-If no issue exists, create one. Complete the template, and add any further information that
-could be relevant such as steps to reproduce, stack traces, screenshots, git/OS version, etc.
-
-## Pull Requests
-
-Want to contribute some code? Great! In addition to the regular GitHub Pull Request workflow,
-you'll want to browse our [wiki](https://github.com/gitextensions/gitextensions/wiki).
-
-Good places to start contributing include:
-
-- Open [bugs](https://github.com/gitextensions/gitextensions/labels/%3Abeetle%3A%20type%3A%20bug)
-- Open issues marked [good first issue](https://github.com/gitextensions/gitextensions/labels/%3Anerd_face%3A%20good%20first%20issue)
-- Open issues marked [up-for-grabs](https://github.com/gitextensions/gitextensions/labels/up-for-grabs)
-
-It's a good idea to mention that you're picking something up by commenting on its issue.
-
-If no issue exists, create one before making a PR. This creates the opportunity to discuss
-the issue before you spend time on its implementation. You will likely be more effective
-this way, and have a greater chance of satisfaction in the end.
-
-Pull requests will be reviewed by one or more team members. To improve the chance of your
-pull request being merged, your contribution should be as easy to review as possible.
-Specifically:
-
-- Be focused in scope
-- Be comprised of clear commits (use interactive rebase to tidy things up if needed)
-- Include a clear description of the changes and why they should be made
-- Be accompanied by unit tests
-- Be consistent with the current code style
-  Most style guides etc are referred to in [Copilot instructions](https://github.com/gitextensions/gitextensions/blob/master/.github/copilot-instructions.md).
-
-When filing a pull request, you should be prepared to answer questions about your changes
-and to perform additional work on the changes in response to review feedback.
-
-[Learn how we deal with translations](https://github.com/gitextensions/gitextensions/wiki/Translations).
-
-## Git Blame
-
-This repository includes a `.git-blame-ignore-revs` file that lists commits with
-large-scale, non-functional changes (e.g. formatting, namespace style). GitHub's
-blame view can use this file. To enable the same behavior locally, run this once per clone:
-
-```
-git config blame.ignoreRevsFile .git-blame-ignore-revs
-```
-
-## Conduct
-
-Please review our [code of conduct](CODE_OF_CONDUCT.md).
+This project builds on [Git Extensions](https://github.com/gitextensions/gitextensions), a
+project with hundreds of contributors over two decades. See
+[contributors.txt](contributors.txt) for the upstream contributor list.
