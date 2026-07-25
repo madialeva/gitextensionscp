@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using CommonTestUtils;
+﻿using CommonTestUtils;
 using GitCommands;
 using GitCommands.Git;
 using GitCommands.Submodules;
@@ -7,6 +6,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtUtils;
 using GitUI;
 using GitUI.CommandsDialogs;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GitExtensions.UITests.CommandsDialogs;
 
@@ -72,11 +72,12 @@ public class FormBrowse_LeftPanel_SubmodulesTests
 
         _provider = new SubmoduleStatusProvider(new GitExecutorProvider(new GitDirectoryResolver()));
 
-        IServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
-        serviceContainer.RemoveService<ISubmoduleStatusProvider>();
-        serviceContainer.AddService(_provider);
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider(services =>
+        {
+            services.AddSingleton(_provider);
+        });
 
-        _commands = new GitUICommands(serviceContainer, _repo1Module);
+        _commands = new GitUICommands(serviceProvider, _repo1Module);
     }
 
     [TearDown]

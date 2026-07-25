@@ -45,7 +45,7 @@ public class RevisionGridControlTests
         _referenceRepository.CreateCommit("head commit");
         _headCommit = _referenceRepository.CommitHash!;
 
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _referenceRepository.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _referenceRepository.Module);
 
         AppSettings.RevisionGraphShowArtificialCommits = true;
     }

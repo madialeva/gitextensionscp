@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using GitCommands;
+﻿using GitCommands;
 using GitCommands.Git;
 using GitCommands.Submodules;
 using GitExtensions.Extensibility.Git;
@@ -10,6 +9,7 @@ using GitUI.ConsoleEmulation.PlainText;
 using GitUI.Hotkey;
 using GitUI.Models;
 using GitUI.ScriptsEngine;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using ResourceManager;
 
@@ -17,37 +17,39 @@ namespace GitExtensions.UITests;
 
 public static class GlobalServiceContainer
 {
-    public static ServiceContainer CreateDefaultMockServiceContainer()
+    public static IServiceProvider CreateDefaultMockServiceProvider(Action<IServiceCollection>? configure = null)
     {
-        ServiceContainer serviceContainer = new();
+        ServiceCollection services = new();
 
-        serviceContainer.AddService(Substitute.For<IOutputHistoryProvider>());
+        services.AddSingleton<IOutputHistoryProvider>(Substitute.For<IOutputHistoryProvider>());
 
-        serviceContainer.AddService(Substitute.For<IAppTitleGenerator>());
-        serviceContainer.AddService(Substitute.For<IWindowsJumpListManager>());
-        serviceContainer.AddService(Substitute.For<ILinkFactory>());
-        serviceContainer.AddService(Substitute.For<IRepositoryHistoryUIService>());
+        services.AddSingleton<IAppTitleGenerator>(Substitute.For<IAppTitleGenerator>());
+        services.AddSingleton<IWindowsJumpListManager>(Substitute.For<IWindowsJumpListManager>());
+        services.AddSingleton<ILinkFactory>(Substitute.For<ILinkFactory>());
+        services.AddSingleton<IRepositoryHistoryUIService>(Substitute.For<IRepositoryHistoryUIService>());
 
         IScriptsManager scriptsManager = Substitute.For<IScriptsManager>();
         scriptsManager.GetScripts().Returns([]);
-        serviceContainer.AddService(scriptsManager);
+        services.AddSingleton<IScriptsManager>(scriptsManager);
 
-        serviceContainer.AddService(Substitute.For<IScriptsRunner>());
+        services.AddSingleton<IScriptsRunner>(Substitute.For<IScriptsRunner>());
 
-        serviceContainer.AddService(Substitute.For<IHotkeySettingsManager>());
-        serviceContainer.AddService(Substitute.For<IHotkeySettingsLoader>());
+        services.AddSingleton<IHotkeySettingsManager>(Substitute.For<IHotkeySettingsManager>());
+        services.AddSingleton<IHotkeySettingsLoader>(Substitute.For<IHotkeySettingsLoader>());
 
-        serviceContainer.AddService(Substitute.For<ISubmoduleStatusProvider>());
+        services.AddSingleton<ISubmoduleStatusProvider>(Substitute.For<ISubmoduleStatusProvider>());
 
         IGitBranchNameNormaliser branchNameNormaliser = Substitute.For<IGitBranchNameNormaliser>();
         branchNameNormaliser.Normalise(Arg.Any<string?>(), Arg.Any<GitBranchNameOptions>())
             .Returns(callInfo => callInfo.Arg<string?>());
-        serviceContainer.AddService(branchNameNormaliser);
+        services.AddSingleton<IGitBranchNameNormaliser>(branchNameNormaliser);
 
-        serviceContainer.AddService<IGitExecutorProvider>(new GitExecutorProvider(new GitDirectoryResolver()));
+        services.AddSingleton<IGitExecutorProvider>(new GitExecutorProvider(new GitDirectoryResolver()));
 
-        serviceContainer.AddService<IConsoleEmulatorsRegistry>(PlainTextConsoleEmulatorsRegistry.Instance);
+        services.AddSingleton<IConsoleEmulatorsRegistry>(PlainTextConsoleEmulatorsRegistry.Instance);
 
-        return serviceContainer;
+        configure?.Invoke(services);
+
+        return services.BuildServiceProvider();
     }
 }
