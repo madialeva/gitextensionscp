@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.Design;
-using CommonTestUtils;
+﻿using CommonTestUtils;
 using GitCommands;
 using GitCommands.Git;
 using GitExtensions.Extensibility;
@@ -7,6 +6,7 @@ using GitExtensions.Extensibility.Git;
 using GitExtUtils;
 using GitUI;
 using GitUIPluginInterfaces;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using ResourceManager;
 
@@ -27,13 +27,14 @@ public class CommitInfoTests
     public void SetUp()
     {
         _mockLinkFactory = new();
-        ServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
-        serviceContainer.RemoveService<ILinkFactory>();
-        serviceContainer.AddService<ILinkFactory>(_mockLinkFactory);
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider(services =>
+        {
+            services.AddSingleton<ILinkFactory>(_mockLinkFactory);
+        });
 
         AppSettings.ShowGitNotes = false;
         _referenceRepository = new ReferenceRepository();
-        _commands = new GitUICommands(serviceContainer, _referenceRepository.Module);
+        _commands = new GitUICommands(serviceProvider, _referenceRepository.Module);
 
         // mock git executable
         _gitExecutable = new MockExecutable();

@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.Design;
-using GitExtensions.Extensibility.Git;
+﻿using GitExtensions.Extensibility.Git;
 using GitUI;
 using GitUI.UserControls;
 using GitUIPluginInterfaces;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitExtensions.UITests.CommandsDialogs;
@@ -17,9 +17,9 @@ public class FileStatusListTests
     [SetUp]
     public void SetUp()
     {
-        ServiceContainer serviceContainer = GlobalServiceContainer.CreateDefaultMockServiceContainer();
+        IServiceProvider serviceProvider = GlobalServiceContainer.CreateDefaultMockServiceProvider();
         IGitModule module = Substitute.For<IGitModule>();
-        GitUICommands commands = new(serviceContainer, module);
+        GitUICommands commands = new(serviceProvider, module);
         IGitUICommandsSource uiCommandsSource = Substitute.For<IGitUICommandsSource>();
         uiCommandsSource.UICommands.Returns(x => commands);
 

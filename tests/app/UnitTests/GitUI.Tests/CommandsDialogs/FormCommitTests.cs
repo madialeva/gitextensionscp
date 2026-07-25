@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.Design;
-using GitExtensions.Extensibility.Git;
+﻿using GitExtensions.Extensibility.Git;
 using GitExtUtils;
 using GitUI;
 using GitUI.CommandsDialogs;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitUITests.CommandsDialogs;
@@ -14,11 +14,12 @@ public class FormCommitTests
     [SetUp]
     public void Setup()
     {
-        ServiceContainer serviceContainer = new();
-        serviceContainer.AddService(Substitute.For<GitUI.Hotkey.IHotkeySettingsManager>());
-        serviceContainer.AddService(Substitute.For<ResourceManager.IHotkeySettingsLoader>());
-        serviceContainer.AddService(Substitute.For<GitUI.ScriptsEngine.IScriptsRunner>());
-        GitUICommands commands = new(serviceContainer, _gitModule);
+        ServiceCollection services = new();
+        services.AddSingleton(Substitute.For<GitUI.Hotkey.IHotkeySettingsManager>());
+        services.AddSingleton(Substitute.For<ResourceManager.IHotkeySettingsLoader>());
+        services.AddSingleton(Substitute.For<GitUI.ScriptsEngine.IScriptsRunner>());
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
+        GitUICommands commands = new(serviceProvider, _gitModule);
         _formCommit = new FormCommit(commands);
     }
 
