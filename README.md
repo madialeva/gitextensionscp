@@ -45,7 +45,11 @@ cd gitextensionscp
 dotnet build
 ```
 
-The resulting (still WinForms, Windows-only) application is at
+The new cross-platform Avalonia shell (under development) is built at
+`artifacts/Debug/bin/GitExtensions.Avalonia/net10.0/GitExtensions.Avalonia.dll`
+(run with `dotnet run --project src/app/GitExtensions.Avalonia`).
+
+The WinForms app (Windows-only, maintained as reference) is built at
 `artifacts/Debug/bin/GitExtensions/net10.0-windows/GitExtensions.exe`.
 
 ## Credits
