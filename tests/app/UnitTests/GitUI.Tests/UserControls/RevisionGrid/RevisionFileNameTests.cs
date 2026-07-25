@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.Design;
-using CommonTestUtils;
+﻿using CommonTestUtils;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
 using GitExtUtils;
 using GitUI;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
 namespace GitUITests.UserControls.RevisionGrid;
@@ -21,15 +21,16 @@ public class RevisionFileNameTests
         _executable = new MockExecutable();
         _commandRunner = new GitCommandRunner(_executable, () => GitModule.SystemEncoding);
 
-        ServiceContainer serviceContainer = new();
-        serviceContainer.AddService(Substitute.For<GitUI.Hotkey.IHotkeySettingsManager>());
-        serviceContainer.AddService(Substitute.For<ResourceManager.IHotkeySettingsLoader>());
+        ServiceCollection services = new();
+        services.AddSingleton(Substitute.For<GitUI.Hotkey.IHotkeySettingsManager>());
+        services.AddSingleton(Substitute.For<ResourceManager.IHotkeySettingsLoader>());
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
 
         IGitModule gitModule = Substitute.For<IGitModule>();
         gitModule.GitExecutable.Returns(_ => _executable);
         gitModule.GitCommandRunner.Returns(_ => _commandRunner);
 
-        GitUICommands uiCommands = new(serviceContainer, gitModule);
+        GitUICommands uiCommands = new(serviceProvider, gitModule);
 
         IGitUICommandsSource uiCommandsSource = Substitute.For<IGitUICommandsSource>();
         uiCommandsSource.UICommands.Returns(_ => uiCommands);

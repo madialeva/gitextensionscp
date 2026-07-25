@@ -53,7 +53,7 @@ public class FormBrowse_LeftPanel_RemotesTests
             _referenceRepository.Module.AddRemote(name, $"http://localhost/remotes/{name}.git");
         }
 
-        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceContainer(), _referenceRepository.Module);
+        _commands = new GitUICommands(GlobalServiceContainer.CreateDefaultMockServiceProvider(), _referenceRepository.Module);
         _remotesManager = new ConfigFileRemoteSettingsManager(() => _referenceRepository.Module);
     }
 
