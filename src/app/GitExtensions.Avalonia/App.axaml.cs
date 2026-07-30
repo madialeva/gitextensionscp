@@ -1,13 +1,23 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Storage;
+using GitCommands;
+using GitExtensions.Avalonia.Services;
+using GitExtUtils;
 using GitUI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Threading;
 
 namespace GitExtensions.Avalonia;
 
 public partial class App : Application
 {
+    internal static IServiceProvider ServiceProvider { get; private set; } = null!;
+
+    internal static Window? MainWindow { get; private set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -17,51 +27,54 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // ──────────────────────────────────────────────────────────────────
-            // JoinableTaskContext initialization with AvaloniaSynchronizationContext
-            // ──────────────────────────────────────────────────────────────────
-            //
-            // WHY IS THIS HERE?
-            //   GitExtensions uses Microsoft.VisualStudio.Threading (VS-Threading)
-            //   extensively: ThreadHelper.FileAndForget, SwitchToMainThreadAsync,
-            //   JoinableTaskFactory.Run, etc. — 323 usages across the codebase.
-            //   All of these depend on a shared JoinableTaskContext that captures
-            //   the UI thread's SynchronizationContext so background work can
-            //   switch back to the main thread.
-            //
-            //   In WinForms, this is done in Program.cs by creating a dummy Form:
-            //     using (new Form()) { ThreadHelper.JoinableTaskContext = new JoinableTaskContext(); }
-            //   The Form installs WindowsFormsSynchronizationContext, which the
-            //   JoinableTaskContext constructor captures via SynchronizationContext.Current.
-            //
-            // WHY HERE AND NOT EARLIER?
-            //   Avalonia installs its SynchronizationContext (AvaloniaSynchronizationContext)
-            //   during AppBuilder.StartWithClassicDesktopLifetime(), which runs AFTER
-            //   the App constructor but BEFORE OnFrameworkInitializationCompleted().
-            //   If we initialize JoinableTaskContext too early (e.g. in the constructor
-            //   or in Initialize()), SynchronizationContext.Current would be null or
-            //   the default .NET context — and SwitchToMainThreadAsync would not
-            //   return to the Avalonia UI thread.
-            //
-            //   By the time we reach this method, AppBuilder has already called
-            //   AvaloniaSynchronizationContext.AutoInstall(), so
-            //   SynchronizationContext.Current is the correct Avalonia context.
-            //
-            // VALIDATION (2026-07-25):
-            //   A spike button was added during implementation (change 1.1b) that
-            //   exercised the full flow: FileAndForget → background Task.Delay →
-            //   SwitchToMainThreadAsync → update UI. The test passed: the UI updated
-            //   correctly from the main thread. JoinableTaskContext is compatible
-            //   with AvaloniaSynchronizationContext.
-            //
-            // SEE ALSO:
-            //   openspec/changes/archive/2026-07-25-jtf-replumbing/design.md
-            //   AVALONIA_MIGRATION_ANALYSIS.md §10.8
-            //   WinForms init: src/app/GitExtensions/Program.cs:113-118
-            // ──────────────────────────────────────────────────────────────────
             ThreadHelper.JoinableTaskContext = new JoinableTaskContext();
 
+            ServiceCollection services = new();
+            services.AddAvaloniaServices();
+            ServiceProvider = services.BuildServiceProvider();
+
+            TaskManager.ExceptionReporter = ex =>
+            {
+                ExceptionDialog dialog = new(ex);
+                dialog.ShowDialog(MainWindow!);
+            };
+
+            UserMessageHandler.ShowError = (owner, text, caption) =>
+            {
+                ErrorDialog dialog = new(caption ?? "Error", text ?? "");
+                Window? parent = WindowAdapterHelper.ResolveOwner(owner) ?? MainWindow;
+                dialog.ShowDialog(parent!);
+            };
+
+            OsShellUtil.PickFolder = (owner, selectedPath) =>
+            {
+                Window? parent = WindowAdapterHelper.ResolveOwner(owner) ?? MainWindow;
+                if (parent is null)
+                {
+                    return null;
+                }
+
+                return ThreadHelper.JoinableTaskFactory.Run(async () =>
+                {
+                    IStorageFolder? suggestedStart = selectedPath is not null
+                        ? await parent.StorageProvider.TryGetFolderFromPathAsync(selectedPath)
+                        : null;
+
+                    IReadOnlyList<IStorageFolder> folders =
+                        await parent.StorageProvider.OpenFolderPickerAsync(
+                            new FolderPickerOpenOptions
+                            {
+                                Title = "Select folder",
+                                AllowMultiple = false,
+                                SuggestedStartLocation = suggestedStart
+                            });
+
+                    return folders.Count > 0 ? folders[0].Path.LocalPath : null;
+                });
+            };
+
             desktop.MainWindow = new MainWindow();
+            MainWindow = desktop.MainWindow;
         }
 
         base.OnFrameworkInitializationCompleted();
