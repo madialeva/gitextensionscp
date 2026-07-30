@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GitExtUtils\GitExtUtils.csproj" />
+    <ProjectReference Include="..\GitCommands\GitCommands.csproj" />
   </ItemGroup>
 
 </Project>
