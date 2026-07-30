@@ -4,7 +4,8 @@
 Shell Avalonia del proyecto: proyecto `GitExtensions.Avalonia` con tema Fluent que compila
 en Windows y Linux. Es el punto de partida para todos los cambios de UI Avalonia en Fase 1
 y siguientes. Establecida por el change 1.1a (`hello-avalonia`); ampliada con inicializacion
-de JTF en el change 1.1b (`jtf-replumbing`).
+de JTF en el change 1.1b (`jtf-replumbing`) y con DI + delegates en el change 1.1c
+(`di-shell-delegates`).
 
 ## Requirements
 ### Requirement: Proyecto Avalonia en la solución
@@ -43,7 +44,8 @@ El proyecto SHALL referenciar los paquetes `Avalonia`, `Avalonia.Desktop`,
 centralizadas en `Directory.Packages.props`. `Microsoft.VisualStudio.Threading` se obtiene
 via la referencia global en `Directory.Build.targets`. El proyecto SHALL tener un
 `ProjectReference` a `GitExtUtils` (cross-platform, sin WinForms) para acceder a
-`ThreadHelper`.
+`ThreadHelper`, y un `ProjectReference` a `GitCommands` (cross-platform, `net10.0`) para
+registrar sus servicios en el contenedor DI y acceder a tipos como `IGitDirectoryResolver`.
 
 #### Scenario: Versiones en Directory.Packages.props
 - **WHEN** se busca `Avalonia` en `Directory.Packages.props`
@@ -54,6 +56,7 @@ via la referencia global en `Directory.Build.targets`. El proyecto SHALL tener u
 - **THEN** contiene `PackageReference` para `Avalonia`, `Avalonia.Desktop`,
   `Avalonia.Themes.Fluent` y `CommunityToolkit.Mvvm`
 - **AND** contiene `ProjectReference` a `GitExtUtils`
+- **AND** contiene `ProjectReference` a `GitCommands`
 
 #### Scenario: VS-Threading disponible via referencia global
 - **WHEN** se compila el proyecto
@@ -61,20 +64,20 @@ via la referencia global en `Directory.Build.targets`. El proyecto SHALL tener u
   explicito en el csproj
 
 ### Requirement: Sin dependencias de WinForms
-El proyecto `GitExtensions.Avalonia` SHALL NOT referenciar `GitCommands`, `GitUI`,
-`GitExtUtils.WinForms` ni ningun ensamblado con dependencia de WinForms. La referencia
-a `GitExtUtils` (cross-platform, `net10.0`, `UseWindowsForms=false`) es aceptable y
-necesaria para `ThreadHelper`. SHALL compilar como `net10.0` puro sin `UseWindowsForms`.
+El proyecto `GitExtensions.Avalonia` SHALL NOT referenciar `GitUI`,
+`GitExtUtils.WinForms` ni ningun ensamblado con dependencia de WinForms fuera de
+`GitExtUtils` y `GitCommands` (ambos cross-platform, `net10.0`, `UseWindowsForms=false`).
+SHALL compilar como `net10.0` puro sin `UseWindowsForms`.
 
 #### Scenario: Sin dependencias WinForms
 - **WHEN** se inspeccionan las referencias de `GitExtensions.Avalonia.csproj`
-- **THEN** no hay `ProjectReference` a `GitCommands`, `GitUI`, `GitExtUtils.WinForms` ni
+- **THEN** no hay `ProjectReference` a `GitUI`, `GitExtUtils.WinForms` ni
   ningun proyecto con `UseWindowsForms=true`
 
-#### Scenario: Compilación multiplataforma
+#### Scenario: Compilacion multiplataforma
 - **WHEN** se compila el proyecto
 - **THEN** el TFM efectivo es `net10.0` (sin `-windows`) y `UseWindowsForms` es `false`
 
-#### Scenario: Referencia a GitExtUtils permitida
+#### Scenario: Referencia a GitExtUtils y GitCommands permitida
 - **WHEN** se inspecciona `GitExtensions.Avalonia.csproj`
-- **THEN** contiene `ProjectReference` a `GitExtUtils` (ensamblado cross-platform)
+- **THEN** contiene `ProjectReference` a `GitExtUtils` y `GitCommands` (ambos cross-platform)
