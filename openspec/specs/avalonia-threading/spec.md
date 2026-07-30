@@ -3,7 +3,8 @@
 ## Purpose
 Inicialización de `JoinableTaskContext` con `AvaloniaSynchronizationContext` en la shell
 Avalonia, validando que `ThreadHelper.FileAndForget` y `SwitchToMainThreadAsync` funcionan
-correctamente. Establecida por el change 1.1b (`jtf-replumbing`).
+correctamente. Establecida por el change 1.1b (`jtf-replumbing`); ampliada con el cableado
+de `ExceptionReporter` a dialogo Avalonia en el change 1.1c (`di-shell-delegates`).
 
 ## Requirements
 ### Requirement: JoinableTaskContext inicializado con AvaloniaSynchronizationContext
@@ -45,3 +46,16 @@ via `InternalsVisibleTo` para poder asignar `ThreadHelper.JoinableTaskContext`.
 #### Scenario: ThreadHelper.JoinableTaskContext asignable
 - **WHEN** el codigo de `App.axaml.cs` asigna `ThreadHelper.JoinableTaskContext = new JoinableTaskContext()`
 - **THEN** la compilacion tiene exito
+
+### Requirement: TaskManager.ExceptionReporter cableado a dialogo Avalonia
+La shell Avalonia SHALL instalar un handler en `TaskManager.ExceptionReporter` que muestre
+la excepcion demystificada en un dialogo modal Avalonia, en lugar del comportamiento por
+defecto que solo escribe a `Trace.TraceError`.
+
+#### Scenario: Excepcion de FileAndForget se muestra al usuario
+- **WHEN** una tarea lanzada con `ThreadHelper.FileAndForget` lanza una excepcion
+- **THEN** se abre una ventana modal con titulo "Error" mostrando el mensaje y stack trace
+
+#### Scenario: El handler se instala durante el startup
+- **WHEN** la aplicacion completa `OnFrameworkInitializationCompleted()`
+- **THEN** `TaskManager.ExceptionReporter` referencia un delegate que muestra un dialogo Avalonia
