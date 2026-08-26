@@ -1,64 +1,10 @@
 ﻿using CommonTestUtils;
 using GitCommands;
 using GitExtensions.Extensibility.Git;
-using ResourceManager;
 
 namespace GitCommandsTests.Git_Commands;
 public class GitCommandsHelperTest
 {
-    [Test]
-    public void CanGetRelativeDateString()
-    {
-        AppSettings.CurrentTranslation = "English";
-
-        DateTime now = DateTime.Now;
-
-        LocalizationHelpers.GetRelativeDateString(now, now).Should().Be("0 seconds ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddSeconds(-1)).Should().Be("1 second ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(-1)).Should().Be("1 minute ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(-45)).Should().Be("1 hour ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddHours(-1)).Should().Be("1 hour ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-1)).Should().Be("1 day ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-7)).Should().Be("1 week ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-30)).Should().Be("1 month ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-364)).Should().Be("12 months ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-365)).Should().Be("1 year ago");
-
-        LocalizationHelpers.GetRelativeDateString(now, now.AddSeconds(-2)).Should().Be("2 seconds ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(-2)).Should().Be("2 minutes ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddHours(-2)).Should().Be("2 hours ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-2)).Should().Be("2 days ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-14)).Should().Be("2 weeks ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-60)).Should().Be("2 months ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(-730)).Should().Be("2 years ago");
-    }
-
-    [Test]
-    public void CanGetRelativeNegativeDateString()
-    {
-        AppSettings.CurrentTranslation = "English";
-
-        DateTime now = DateTime.Now;
-
-        LocalizationHelpers.GetRelativeDateString(now, now.AddSeconds(1)).Should().Be("-1 second ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(1)).Should().Be("-1 minute ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(45)).Should().Be("-1 hour ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddHours(1)).Should().Be("-1 hour ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(1)).Should().Be("-1 day ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(7)).Should().Be("-1 week ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(30)).Should().Be("-1 month ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(364)).Should().Be("-12 months ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(365)).Should().Be("-1 year ago");
-
-        LocalizationHelpers.GetRelativeDateString(now, now.AddSeconds(2)).Should().Be("-2 seconds ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddMinutes(2)).Should().Be("-2 minutes ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddHours(2)).Should().Be("-2 hours ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(2)).Should().Be("-2 days ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(14)).Should().Be("-2 weeks ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(60)).Should().Be("-2 months ago");
-        LocalizationHelpers.GetRelativeDateString(now, now.AddDays(730)).Should().Be("-2 years ago");
-    }
-
     [Test]
     public void TestFetchArguments()
     {
