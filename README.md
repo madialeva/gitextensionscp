@@ -23,7 +23,7 @@ The journey started on **July 11, 2026**, from the upstream stable tag `v7.2.0`.
 
 ## Status
 
-[![Fork CI](https://github.com/angazo/gitextensionscp/actions/workflows/fork-ci.yml/badge.svg?event=pull_request)](https://github.com/angazo/gitextensionscp/actions/workflows/fork-ci.yml)
+[![Fork CI](https://github.com/madialeva/gitextensionscp/actions/workflows/fork-ci.yml/badge.svg?event=pull_request)](https://github.com/madialeva/gitextensionscp/actions/workflows/fork-ci.yml)
 
 The migration is developed incrementally, phase by phase:
 
@@ -40,7 +40,7 @@ The migration is developed incrementally, phase by phase:
 Requirements: [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and git.
 
 ```powershell
-git clone --recurse-submodules https://github.com/angazo/gitextensionscp.git
+git clone --recurse-submodules https://github.com/madialeva/gitextensionscp.git
 cd gitextensionscp
 dotnet build
 ```
