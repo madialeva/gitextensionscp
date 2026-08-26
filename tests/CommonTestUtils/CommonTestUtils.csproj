@@ -8,17 +8,10 @@
     <TestProject>false</TestProject>
     <IsTestProject>false</IsTestProject>
 
-    <!-- Multi-target: net10.0 for Linux CI canary, net10.0-windows for full Windows tests -->
-    <TargetFramework></TargetFramework>
-    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
-    <UseWindowsForms Condition="'$(TargetFramework)'=='net10.0'">false</UseWindowsForms>
+    <!-- Cross-platform test utilities (no WinForms): single net10.0 target. -->
+    <TargetFramework>net10.0</TargetFramework>
+    <UseWindowsForms>false</UseWindowsForms>
   </PropertyGroup>
-
-  <!-- On net10.0, exclude files that require WinForms -->
-  <ItemGroup Condition="'$(TargetFramework)'=='net10.0'">
-    <Compile Remove="ConfigureJoinableTaskFactoryAttribute.cs" />
-    <Compile Remove="WinFormsTestHelper.cs" />
-  </ItemGroup>
 
   <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
     <DefineConstants>$(DefineConstants);CI_BUILD</DefineConstants>

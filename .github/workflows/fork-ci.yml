@@ -100,7 +100,7 @@ jobs:
           retention-days: 31
 
   verify-linux:
-    name: Build + unit tests (Linux canary)
+    name: Build + unit tests (Linux)
 
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -116,7 +116,7 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Verificar Linux (core net10.0 + GitCommands.Tests subset)
+      - name: Verificar Linux (solución cross-platform + GitCommands.Tests net10.0)
         run: pwsh -File eng/Verify-Linux.ps1
 
       - name: Publicar resultados de tests (solo si falla)
