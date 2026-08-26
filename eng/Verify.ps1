@@ -1,16 +1,19 @@
 <#
 .SYNOPSIS
-    Verifies the repository: builds the full solution and runs all unit tests.
+    Verifies the repository: builds the cross-platform solution and runs the
+    cross-platform unit tests.
 
 .DESCRIPTION
-    Single source of truth for "the repo is verified". Used both locally (run it
-    at any time, from any directory) and by CI (.github/workflows/fork-ci.yml),
-    which is a thin wrapper around this script.
+    Single source of truth for "the repo is verified" on Windows. Used locally
+    (run it at any time, from any directory) and by CI
+    (.github/workflows/fork-ci.yml), which is a thin wrapper around this script.
 
-    Scope: builds GitExtensions.slnx and runs the unit test projects under
-    tests/app/UnitTests and tests/plugins/UnitTests. Integration tests
-    (tests/app/IntegrationTests) are excluded on purpose: they instantiate real
-    WinForms forms and are known to be fragile on CI runners.
+    Scope: builds GitExtensions.slnx (the cross-platform solution) and runs the
+    cross-platform unit test projects on net10.0. The WinForms solution
+    (GitExtensions.WinForms.slnx) and the Windows-only test projects
+    (GitUI.Tests, ResourceManager.Tests, BugReporter.Tests, plugin tests) are
+    out of scope: they are kept as reference for the Avalonia port and are not
+    validated. Integration tests (tests/app/IntegrationTests) remain excluded.
 
     TRX result files are written to artifacts/<Configuration>/TestResults/.
 
@@ -35,6 +38,12 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $solution = Join-Path $repoRoot 'GitExtensions.slnx'
 $testResultsDir = Join-Path $repoRoot "artifacts\$Configuration\TestResults"
 
+# Cross-platform unit test projects (net10.0). Windows-only test projects and
+# integration tests are excluded by design (see the header).
+$testProjects = @(
+    'tests\app\UnitTests\GitCommands.Tests\GitCommands.Tests.csproj'
+)
+
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 Write-Host ''
@@ -46,28 +55,20 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Discover unit test projects. Integration tests are excluded by design.
-$unitTestRoots = @(
-    (Join-Path $repoRoot 'tests\app\UnitTests'),
-    (Join-Path $repoRoot 'tests\plugins\UnitTests')
-)
-$testProjects = $unitTestRoots |
-    ForEach-Object { Get-ChildItem -Path $_ -Recurse -Filter '*.csproj' } |
-    Sort-Object Name
-
 Write-Host ''
 Write-Host "=== Verify: unit tests ($($testProjects.Count) projects) ===" -ForegroundColor Cyan
 
 $results = @()
 foreach ($project in $testProjects) {
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($project)
     Write-Host ''
-    Write-Host "--- $($project.BaseName)" -ForegroundColor Cyan
-    # --no-build: the solution build above already compiled every test project.
-    dotnet test $project.FullName -c $Configuration --no-build -f net10.0-windows `
-        --logger "trx;LogFileName=$($project.BaseName).trx" `
+    Write-Host "--- $name" -ForegroundColor Cyan
+    # --no-build: the solution build above already compiled the test project.
+    dotnet test (Join-Path $repoRoot $project) -c $Configuration --no-build `
+        --logger "trx;LogFileName=$name.trx" `
         --results-directory $testResultsDir
     $results += [pscustomobject]@{
-        Project = $project.BaseName
+        Project = $name
         Passed  = ($LASTEXITCODE -eq 0)
     }
 }
