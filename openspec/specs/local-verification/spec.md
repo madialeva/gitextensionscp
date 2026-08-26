@@ -2,11 +2,13 @@
 
 ## Purpose
 TBD - created by archiving change add-fork-ci. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Verificación completa con un solo comando
 El repositorio SHALL proveer un script `eng/Verify.ps1` que, ejecutado sin argumentos desde
-cualquier directorio del repo, compile la solución completa (`GitExtensions.slnx`) y ejecute
-todos los unit tests, terminando con exit code 0 si y solo si todo pasa.
+cualquier directorio del repo, compile la solución cross-platform (`GitExtensions.slnx`) y
+ejecute los unit tests cross-platform, terminando con exit code 0 si y solo si todo pasa.
 
 #### Scenario: Repo sano
 - **WHEN** se ejecuta `.\eng\Verify.ps1` sobre un repo que compila y cuyos tests pasan
@@ -24,13 +26,19 @@ todos los unit tests, terminando con exit code 0 si y solo si todo pasa.
   distinto de 0 y el resumen final identifica qué proyectos fallaron
 
 ### Requirement: Alcance de tests limitado a unit tests
-El script SHALL ejecutar únicamente los proyectos de test bajo `tests/app/UnitTests/` y
-`tests/plugins/UnitTests/`, y SHALL NOT ejecutar los proyectos de `tests/app/IntegrationTests/`.
+El script SHALL ejecutar únicamente los proyectos de test cross-platform (`GitCommands.Tests`
+y futuros proyectos de test con pata `net10.0`). SHALL NOT ejecutar los
+proyectos de test Windows-only (`GitUI.Tests`, `ResourceManager.Tests`, `BugReporter.Tests`,
+tests de plugins) ni los proyectos de `tests/app/IntegrationTests/`.
 
 #### Scenario: Descubrimiento de proyectos
 - **WHEN** el script descubre los proyectos de test
-- **THEN** la lista ejecutada contiene todos los `*.csproj` de los directorios de unit tests y
-  ninguno de los de integración
+- **THEN** la lista ejecutada contiene solo proyectos de test cross-platform y ninguno
+  Windows-only ni de integración
+
+#### Scenario: Simetría con Linux
+- **WHEN** se ejecuta `.\eng\Verify.ps1` en Windows
+- **THEN** corre los mismos proyectos de test que `eng/Verify-Linux.ps1` en Linux
 
 ### Requirement: Configuración parametrizable
 El script SHALL aceptar un parámetro `-Configuration` con valores `Release` (por defecto) y
@@ -48,4 +56,3 @@ directorio `artifacts/`, de forma que un sistema externo (CI) pueda recogerlos.
 #### Scenario: Recogida de logs tras un fallo
 - **WHEN** un proyecto de tests falla durante la ejecución del script
 - **THEN** existe un fichero `.trx` con el detalle de ese proyecto bajo `artifacts/`
-

@@ -7,6 +7,7 @@ Windows y sus tests pasan en Linux en CI, demostrando que el core está listo pa
 que no sean WinForms (Avalonia, etc.).
 
 ## Requirements
+
 ### Requirement: Core assemblies target net10.0 without Windows
 Los proyectos `GitExtensions.Extensibility`, `GitExtUtils`, `GitCommands` y
 `GitUIPluginInterfaces` SHALL especificar `TargetFramework` como `net10.0` (sin el sufijo
@@ -44,15 +45,31 @@ para comunicar errores o advertencias al usuario, con un comportamiento por defe
 - **THEN** el aviso no produce excepciones y se registra en trace
 
 ### Requirement: Tests de GitCommands pasan en Linux
-El proyecto `GitCommands.Tests` SHALL compilar y pasar un subset significativo de tests
-(>90%) en Linux, excluyendo únicamente los tests con dependencias de infraestructura
-WinForms (`ConfigureJoinableTaskFactory`, `ResourceManager.LocalizationHelpers`).
+El proyecto `GitCommands.Tests` SHALL compilar y pasar todos sus tests como `net10.0` (Windows
+y Linux), sin depender de WinForms ni de `ResourceManager`/`GitExtUtils.WinForms`. La
+infraestructura de test cross-platform (`ConfigureJoinableTaskFactory` + un
+`SingleThreadSynchronizationContext` neutro) SHALL inicializar el `JoinableTaskContext` de modo
+que `SwitchToMainThreadAsync` funcione sin message loop de WinForms.
 
 #### Scenario: CI Linux ejecuta los tests
 - **WHEN** un push/PR activa el job `verify-linux`
-- **THEN** el script compila los ensamblados core (`net10.0`) y ejecuta `GitCommands.Tests`
-  con `-f net10.0`, pasando >90% de los tests
+- **THEN** el script compila la solución cross-platform (`GitExtensions.slnx`) y ejecuta
+  `GitCommands.Tests`, pasando todos los tests
 
 #### Scenario: Misma lógica, dos sistemas operativos
 - **WHEN** el mismo commit se comprueba en `verify-windows` y `verify-linux`
 - **THEN** los tests comunes producen el mismo resultado en ambas plataformas
+
+### Requirement: Tests del core sin dependencias de WinForms
+`GitCommands.Tests` y `CommonTestUtils` SHALL ser proyectos `net10.0` puros (sin pata
+`net10.0-windows`, sin `#if WINDOWS`, sin `UseWindowsForms`) y SHALL NOT referenciar
+`ResourceManager`, `GitExtUtils.WinForms` ni ningún ensamblado Windows-only.
+
+#### Scenario: Referencias de GitCommands.Tests
+- **WHEN** se inspecciona `GitCommands.Tests.csproj`
+- **THEN** no existe ningún `ProjectReference` a `ResourceManager`, `GitExtUtils.WinForms` ni
+  `GitUI`, y el `TargetFramework` es `net10.0`
+
+#### Scenario: Sin código condicional en CommonTestUtils
+- **WHEN** se busca `#if WINDOWS` en `tests/CommonTestUtils`
+- **THEN** no se encuentra ninguna ocurrencia
