@@ -9,6 +9,11 @@
 
     <!-- Avalonia-specific: stop building when XAML has errors -->
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+
+    <!-- On non-Windows use the portable RID for the apphost. Some distro-packaged
+         SDKs (e.g. Oracle Linux) bake in a non-portable RID (ol.9-x64) for which
+         there is no Microsoft.NETCore.App.Host package on NuGet. -->
+    <DefaultAppHostRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT'">$(NETCoreSdkPortableRuntimeIdentifier)</DefaultAppHostRuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
