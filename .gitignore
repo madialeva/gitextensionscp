@@ -82,5 +82,6 @@ artifacts/
 # AI tools folders and files excluded
 .claude/
 .opencode/
+graphify-out/
 AGENTS.md
 AVALONIA_MIGRATION_ANALYSIS.md
