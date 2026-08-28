@@ -17,6 +17,12 @@
     <TargetFramework>$(SolutionTargetFramework)</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SuppressNETCoreSdkPreviewMessage>false</SuppressNETCoreSdkPreviewMessage>
+
+    <!-- Distro SDKs can use a non-portable RID (for example, ol.9-x64).
+         Use the portable RID for apphosts on non-Windows projects, including
+         virtual projects generated for file-based C# apps. -->
+    <DefaultAppHostRuntimeIdentifier Condition="'$(OS)' != 'Windows_NT' and '$(DefaultAppHostRuntimeIdentifier)' == ''">$(NETCoreSdkPortableRuntimeIdentifier)</DefaultAppHostRuntimeIdentifier>
+
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)eng\GitExtensions.ruleset</CodeAnalysisRuleSet>
 
     <!-- More information: https://aka.ms/msbuild/net8-binaryformatter -->
