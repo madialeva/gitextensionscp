@@ -80,6 +80,7 @@ artifacts/
 *.svclog
 
 # AI tools folders and files excluded
+.github-original/
 .claude/
 .opencode/
 graphify-out/
