@@ -3,6 +3,7 @@ using GitCommands.UserRepositoryHistory;
 using NSubstitute;
 
 namespace GitCommandsTests.UserRepositoryHistory;
+[Platform(Include = "Win")]
 public class RepositoryDescriptionProviderTests
 {
     private string _tempDir = null!;

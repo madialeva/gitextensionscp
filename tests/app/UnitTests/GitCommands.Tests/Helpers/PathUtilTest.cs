@@ -1,6 +1,7 @@
 ﻿using GitCommands;
 
 namespace GitCommandsTests.Helpers;
+[Platform(Include = "Win")]
 public class PathUtilTest
 {
     [TestCase('a', true)]

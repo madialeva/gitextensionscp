@@ -117,7 +117,7 @@ jobs:
           global-json-file: global.json
 
       - name: Verificar Linux (solución cross-platform + GitCommands.Tests net10.0)
-        run: pwsh -File eng/Verify-Linux.ps1
+        run: bash eng/Verify-Linux.sh
 
       - name: Publicar resultados de tests (solo si falla)
         if: failure()

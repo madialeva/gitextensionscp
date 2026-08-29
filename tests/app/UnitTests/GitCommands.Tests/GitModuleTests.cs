@@ -439,6 +439,7 @@ public sealed partial class GitModuleTests
         _gitModule.GetStashesCmd(noLocks).ToString().Should().Be(expected);
     }
 
+    [Platform(Include = "Win")]
     [TestCase("", "")] // empty message
     [TestCase("a\r\nb\r\n\r\nc\r\n\r\n\r\n\r\nd", "a\r\nb\r\n\r\nc\r\n\r\nd")] // various amount of new lines between text lines
     [TestCase("\r\n\r\n\r\n\r\na\r\nb\r\n\r\n\r\n\r\n\r\n\r\n", "a\r\nb")] // trimmable message

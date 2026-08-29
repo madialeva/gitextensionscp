@@ -1,6 +1,7 @@
 ﻿using GitCommands;
 
 namespace GitCommandsTests;
+[Platform(Include = "Win")]
 public class FullPathResolverTests
 {
     private readonly string _workingDir = @"c:\dev\repo";

@@ -28,6 +28,7 @@ Contributions are welcome. If you'd like to propose a change:
 - Keep changes focused and minimal — one concern per PR.
 - Run `eng/Verify.ps1` locally before opening a PR to confirm the full Windows solution builds
   and all unit tests pass.
+- On Linux, run `bash eng/Verify-Linux.sh` to perform the equivalent cross-platform check.
 
 ## Credits
 

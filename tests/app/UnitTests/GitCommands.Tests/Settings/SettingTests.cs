@@ -6,6 +6,7 @@ using GitCommands.Settings;
 using GitExtensions.Extensibility.Settings;
 
 namespace GitCommandsTests.Settings;
+[NonParallelizable]
 internal sealed class SettingTests
 {
     private const string SettingsFileContent = @"<?xml version=""1.0"" encoding=""utf-8""?><dictionary />";

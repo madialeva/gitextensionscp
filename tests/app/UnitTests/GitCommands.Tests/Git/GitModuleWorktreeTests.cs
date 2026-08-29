@@ -5,6 +5,7 @@ using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Git;
 
 namespace GitCommandsTests.Git;
+[Platform(Include = "Win")]
 public sealed class GitModuleWorktreeTests
 {
     private GitModule _gitModule = null!;
