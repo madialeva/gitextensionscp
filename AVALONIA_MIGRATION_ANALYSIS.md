@@ -540,6 +540,7 @@ exclusiones anteriores son decisiones de alcance, no trabajo bloqueante de la sh
 | `jtf-replumbing` | 1.1b | 2026-07-25 | `JoinableTaskContext` con `AvaloniaSynchronizationContext` | `avalonia-threading`, `avalonia-shell` |
 | `di-shell-delegates` | 1.1c | 2026-07-30 | Contenedor MSDI + 3 delegates de shell cableados a diálogos Avalonia | `avalonia-di`, `avalonia-shell`, `avalonia-threading` |
 | `make-avalonia-solution-primary` | 1.1d | 2026-08-26 | `GitExtensions.slnx` = solución cross-platform primaria; CI simétrico Win/Linux; test infra del core sin WinForms (`SingleThreadSynchronizationContext`) | `solution-structure`, `continuous-integration`, `local-verification`, `cross-platform-core` |
+| `extract-localizationhelpers-linux-verification` | 1.1e | 2026-08-29 | Cálculo portable de fechas, tests `net10.0` y verificación Linux con Bash | `cross-platform-core`, `local-verification`, `continuous-integration` |
 
 ### 10.10 Backlog derivado de los NO GOALS
 
@@ -549,6 +550,7 @@ pero sí merecen seguimiento en el milestone **Phase 1 Backlog**:
 | Issue | Motivo | Prioridad |
 |---|---|---|
 | [#20 Add headless tests for Avalonia shell startup and platform delegates](https://github.com/madialeva/gitextensionscp/issues/20) | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
+| [#22 Migrate localization infrastructure and decouple translated resources](https://github.com/madialeva/gitextensionscp/issues/22) | El change #19 dejó fuera la migración de la infraestructura completa de localización/XLIFF y el desacoplamiento de `TranslatedStrings` para la shell Avalonia | Media |
 
 El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
 RevisionGrid (Fase 2), diff viewer (Fase 2), operaciones de escritura (Fase 3), localización
