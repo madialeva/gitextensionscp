@@ -544,12 +544,12 @@ exclusiones anteriores son decisiones de alcance, no trabajo bloqueante de la sh
 ### 10.10 Backlog derivado de los NO GOALS
 
 Los siguientes puntos no son funcionalidad de la shell Avalonia ni bloquean el siguiente change,
-pero sí merecen una issue vinculada al milestone **Backlog Fase 1**:
+pero sí merecen seguimiento en el milestone **Phase 1 Backlog**:
 
-| Issue candidata | Motivo | Prioridad |
+| Issue | Motivo | Prioridad |
 |---|---|---|
-| Extraer `LocalizationHelpers` al core y recuperar sus dos tests cross-platform | El change 1.1d retiró esos tests al separar `ResourceManager`; el helper sigue ligado a la tubería de traducción y necesita una extracción deliberada | Media |
-| Añadir tests headless de la shell Avalonia | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
+| [#19 Extract `LocalizationHelpers` into the portable core](https://github.com/madialeva/gitextensionscp/issues/19) | El change 1.1d retiró esos tests al separar `ResourceManager`; el helper sigue ligado a la tubería de traducción y necesita una extracción deliberada | Media |
+| [#20 Add headless tests for Avalonia shell startup and platform delegates](https://github.com/madialeva/gitextensionscp/issues/20) | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
 
 El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
 RevisionGrid (Fase 2), diff viewer (Fase 2), operaciones de escritura (Fase 3), localización
