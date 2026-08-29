@@ -79,6 +79,9 @@ artifacts/
 .dotnet/
 *.svclog
 
+# Visual Studio Code
+.vscode/
+
 # AI tools folders and files excluded
 .github-original/
 .claude/
