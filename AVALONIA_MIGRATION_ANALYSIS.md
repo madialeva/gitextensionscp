@@ -1,8 +1,8 @@
 # GitExtensions — Análisis del stack tecnológico y viabilidad de migración a Avalonia
 
-> Documento de estudio generado el 2026-07-11 a partir del análisis del código fuente del repositorio.
-> Objetivo: conocer en detalle el stack tecnológico actual y evaluar qué supondría migrar la UI
-> (hoy WinForms, solo Windows) a Avalonia (multiplataforma, MIT).
+> Documento de estudio generado el 2026-07-11 y revisado el 2026-08-29 a partir del análisis
+> del código fuente y de los changes archivados de OpenSpec. Es la fuente de verdad del estado
+> de la migración: decisiones cerradas, alcance vigente y trabajo pendiente.
 
 ---
 
@@ -10,12 +10,12 @@
 
 | Pregunta | Respuesta corta |
 |---|---|
-| ¿Qué UI usa hoy? | **Windows Forms** sobre .NET 10 (`net10.0-windows`), con `UseWindowsForms=true` global |
+| ¿Qué UI usa hoy? | La aplicación funcional sigue siendo **Windows Forms**; la shell Avalonia ya existe y es el objetivo activo |
 | ¿Cuánto código de UI hay? | **~142.000 líneas C#** solo en `GitUI` (761 ficheros), con **68 Forms** y **~36 UserControls**, más UI en 12+ plugins |
-| ¿El core está separado de la UI? | **Sí, razonablemente**: `GitCommands` (~25.500 LOC), `GitExtUtils` y `GitExtensions.Extensibility` no usan WinForms directamente (con matices, ver §6.3) |
+| ¿El core está separado de la UI? | **Sí**: `GitCommands`, `GitExtUtils`, `GitExtensions.Extensibility` y `GitUIPluginInterfaces` targetean `net10.0` sin WinForms |
 | ¿Es viable un "port" de la UI? | **No como traducción 1:1.** Sería una **reescritura de la capa de presentación** reutilizando el core |
 | Esfuerzo estimado | Muy alto: la UI es ~75-80% del código de la aplicación y usa intensivamente owner-drawing, Win32 y componentes WinForms de terceros |
-| Estrategia recomendada | Nueva shell Avalonia (MVVM) que consuma `GitCommands`/`GitExtUtils` + `Extensibility` refactorizada, conviviendo con la app WinForms durante la transición (§8) |
+| Estrategia vigente | Nueva shell Avalonia (MVVM) sobre el core portable, con la solución WinForms conservada solo como referencia (§8) |
 
 ---
 
@@ -24,59 +24,49 @@
 | Aspecto | Detalle |
 |---|---|
 | Runtime | .NET 10 (SDK `10.0`, rollForward feature) — `global.json` |
-| TFM | `net10.0-windows` (definido en `eng/RepoLayout.props` como `SolutionTargetFramework`) |
+| TFM | Core y shell Avalonia en `net10.0`; la solución WinForms de referencia permanece en `net10.0-windows` |
 | Lenguaje | C# **14.0**, `Nullable enable`, `ImplicitUsings`, `TreatWarningsAsErrors` |
 | UI | Windows Forms (`UseWindowsForms=true` en `Directory.Build.props`, aplica a *todos* los proyectos) |
-| Solución | Formato nuevo `.slnx` (`GitExtensions.slnx`) |
+| Soluciones | `GitExtensions.slnx` es la solución cross-platform primaria; `GitExtensions.WinForms.slnx` es referencia |
 | Paquetes | Central Package Management (`Directory.Packages.props`) |
 | Plataformas | x64 (por defecto), x86, arm64 — **solo Windows** |
 | Instalador | WiX 3.14 (MSI) + vswhere |
-| CI | GitHub Actions (`pr-build.yml`, etc.) + AppVeyor (`appveyor.yml`) |
+| CI | GitHub Actions propia: jobs simétricos Windows/Linux sobre `GitExtensions.slnx` |
 | Calidad | StyleCop.Analyzers, Microsoft.CodeAnalysis.BannedApiAnalyzers, ruleset propio, SonarQube, analizador Roslyn propio (`GitExtensions.Analyzers.CSharp`) |
-| Localización | Sistema propio basado en **XLIFF** (`.xlf` por idioma en `GitUI/Translation`) + Transifex; `TranslationApp` como herramienta |
-| Telemetría | Application Insights (`AppInsights.WindowsDesktop`) |
+| Localización | Los ficheros **XLIFF** (`.xlf` por idioma en `GitUI/Translation`) se conservan como datos; la shell Avalonia tendrá una tubería nueva en Fase 4 |
+| Telemetría | No forma parte de la shell Avalonia; el subsistema Windows-only se retira con la UI WinForms |
 
 ---
 
 ## 3. Arquitectura de proyectos
 
 ```
-                    ┌───────────────────────────────┐
-                    │  GitExtensions.exe (WinExe)   │  ← bootstrap, Program.cs, mutex, jump lists
-                    └───────────────┬───────────────┘
-                                    │
-                    ┌───────────────▼───────────────┐
-                    │            GitUI              │  ← 142K LOC, 68 Forms, WinForms puro
-                    │  RevisionGrid │ Editor │ ...  │
-                    └──┬─────────┬─────────┬────────┘
-          ┌────────────┘         │         └───────────────┐
-┌─────────▼─────────┐  ┌─────────▼──────────┐  ┌───────────▼──────────┐
-│    GitCommands    │  │  ResourceManager   │  │  Externals (submód.) │
-│  (lógica git CLI, │  │ (traducción XLIFF, │  │  ICSharpCode.TextEd. │
-│   settings, 25K)  │  │  ligada a WinForms)│  │  ConEmuWinForms      │
-└─────────┬─────────┘  └────────────────────┘  │  NetSpell, Git.hub   │
-          │                                    └──────────────────────┘
-┌─────────▼──────────────────┐   ┌────────────────────────────┐
-│ GitExtensions.Extensibility│◄──┤  Plugins (MEF / VS-MEF)    │
-│ + GitUIPluginInterfaces    │   │  GitHub3, BuildServers,    │
-│ + GitExtUtils              │   │  Statistics, ...  (12+)    │
-└────────────────────────────┘   └────────────────────────────┘
-          │
-┌─────────▼──────────────────────────────────────┐
-│ Nativo C++: GitExtensionsShellEx (shell ext.   │
-│ de Explorer), GitExtSshAskPass (diálogo SSH)   │
-└────────────────────────────────────────────────┘
+                      ┌────────────────────────────────────┐
+                      │ GitExtensions.Avalonia (net10.0)  │  ← objetivo activo
+                      │ App + futura shell MVVM             │
+                      └──────────────────┬─────────────────┘
+                             │
+                    ┌────────────────────────▼────────────────────────┐
+                    │ Core portable: GitCommands + GitExtUtils         │
+                    │ Extensibility + GitUIPluginInterfaces (net10.0)  │
+                    └────────────────────────┬────────────────────────┘
+                             │
+                    ┌────────────────────────▼────────────────────────┐
+                    │ GitExtensions.WinForms.slnx (referencia)         │
+                    │ GitUI, ResourceManager, app WinForms, plugins,   │
+                    │ GitExtUtils.WinForms y externals Windows-only    │
+                    └─────────────────────────────────────────────────┘
 ```
 
 ### Proyectos y su acoplamiento a Windows
 
 | Proyecto | Rol | LOC aprox. | Acoplamiento a Windows/WinForms |
 |---|---|---|---|
-| `src/app/GitExtensions` | Ejecutable, arranque | pequeño | **Alto** (WinExe, mutex, DllImport en Program.cs) |
+| `src/app/GitExtensions` | Ejecutable WinForms de referencia | pequeño | **Alto** (WinExe, mutex, DllImport en Program.cs) |
 | `src/app/GitUI` | Toda la UI | **~142.300** | **Total** — es WinForms puro + Win32 |
-| `src/app/GitCommands` | Lógica git (proceso `git.exe`), settings, config | ~25.500 | **Bajo** — sin `using System.Windows.Forms/Drawing`; 1 DllImport en `ProcessExtensions` |
-| `src/app/GitExtUtils` | Utilidades | medio | **Medio** — contiene `GitUI/DpiUtil`, interops User32/ComCtl32 (separables) |
-| `src/app/GitExtensions.Extensibility` | API pública de plugins | medio | **Medio** — expone `IWin32Window`, `Form`, `Image` en firmas (§6.3) |
+| `src/app/GitCommands` | Lógica git (proceso `git`), settings, config | ~25.500 | **Portable** — target `net10.0`, sin referencia a ensamblados Windows-only |
+| `src/app/GitExtUtils` | Utilidades | medio | **Portable** — los interops WinForms viven en `GitExtUtils.WinForms` |
+| `src/app/GitExtensions.Extensibility` | API pública de plugins | medio | **Portable** — API sin tipos WinForms; iconos como datos y owners como `IWindow` |
 | `src/app/ResourceManager` | Traducción + base de Forms/Controls | medio | **Alto** — recorre árboles de controles WinForms para traducir |
 | `src/app/BugReporter` | Reporte de errores (NBug) | pequeño | Alto (WinExe, 3 forms) |
 | `src/plugins/*` (12+) | Plugins integrados | medio | Mixto: lógica portable + forms de configuración WinForms |
@@ -107,16 +97,16 @@
 | `System.Reactive` / `.Linq` / `.Interfaces` | 5.0 | Rx (autocompletado, eventos) | ✅ |
 | `YamlDotNet` | 16.3 | Tests | ✅ |
 
-### 4.2 Windows-only — habría que sustituir o condicionar por plataforma
+### 4.2 Componentes fuera de la shell Avalonia
 
-| Paquete | Uso | Alternativa multiplataforma |
+| Paquete | Uso | Tratamiento adoptado |
 |---|---|---|
-| `AdysTech.CredentialManager` | Credenciales en Windows Credential Manager (GitExtUtils, Extensibility) | libsecret/Keychain vía abstracción propia, o `git credential` como backend |
-| `AppInsights.WindowsDesktop` | Telemetría | SDK estándar de App Insights / OpenTelemetry |
-| `ConEmu.Core` + submódulo `conemu-inside` | **Terminal embebida** (consola interactiva en la ventana) | No hay equivalente directo; en Avalonia: control de terminal propio (p. ej. estilo vte/xterm.js) o abrir terminal externo |
-| `EnvDTE` | Automatización COM de **Visual Studio** (`GitUI/VisualStudioIntegration.cs`, "abrir en VS") | Solo tiene sentido en Windows; condicionar por SO |
-| `Microsoft-WindowsAPICodePack-Core/-Shell` | Diálogos de shell, taskbar, jump lists | APIs de Avalonia (StorageProvider) + eliminar features de taskbar |
-| `Microsoft.Windows.CsWin32` | Generación de P/Invoke Win32 (28 APIs declaradas en `GitUI/Interops/NativeMethods.txt`) | Desaparecería con la UI nueva |
+| `AdysTech.CredentialManager` | Credenciales en Windows Credential Manager | No se incorpora al core portable; se resolverá junto con settings multiplataforma |
+| `AppInsights.WindowsDesktop` | Telemetría | Se retira con la UI WinForms; no forma parte de la shell Avalonia |
+| `ConEmu.Core` + submódulo `conemu-inside` | **Terminal embebida** (consola interactiva en la ventana) | Se conserva solo en la referencia WinForms; no se porta a la shell Avalonia durante las fases actuales |
+| `EnvDTE` | Automatización COM de **Visual Studio** (`GitUI/VisualStudioIntegration.cs`, "abrir en VS") | Se eliminará con `GitUI`; no forma parte de la shell Avalonia |
+| `Microsoft-WindowsAPICodePack-Core/-Shell` | Diálogos de shell, taskbar, jump lists | `StorageProvider` para selección de carpetas; las features de taskbar quedan fuera de la shell Avalonia |
+| `Microsoft.Windows.CsWin32` | Generación de P/Invoke Win32 (28 APIs declaradas en `GitUI/Interops/NativeMethods.txt`) | Se elimina con la UI nueva |
 
 ### 4.3 Infraestructura de build/test (no afectan a la migración de UI)
 
@@ -130,7 +120,7 @@
 
 | Submódulo | Qué es | Impacto en migración |
 |---|---|---|
-| `ICSharpCode.TextEditor` | Editor de texto **WinForms** (fork). Base del visor de diffs/blame/ficheros (`GitUI/Editor/*`: resaltado de diff, márgenes de blame, números de línea, ANSI) | **Crítico**. Sustituto natural: **AvaloniaEdit** (port de AvalonEdit). Todo `GitUI/Editor` (servicios de highlight de diff, blame margin, etc.) se reescribiría contra su API |
+| `ICSharpCode.TextEditor` | Editor de texto **WinForms** (fork). Base del visor de diffs/blame/ficheros (`GitUI/Editor/*`: resaltado de diff, márgenes de blame, números de línea, ANSI) | **Crítico**. Se sustituye por **AvaloniaEdit**; los servicios de `GitUI/Editor` se reescriben contra su API |
 | `conemu-inside` (ConEmuWinForms) | Embebido del terminal **ConEmu** vía reparenting de ventanas Win32 | **Sin equivalente**. ConEmu es Windows-only. Requiere solución nueva de terminal |
 | `NetSpell.SpellChecker` | Corrector ortográfico (diccionarios propios) integrado con el editor de mensajes de commit | El motor/diccionarios son C# portable; la integración visual (subrayado, menú contextual) se reharía en Avalonia |
 | `Git.hub` | Cliente de API de GitHub sobre RestSharp (usado por plugin GitHub3, pull requests) | ✅ Portable prácticamente tal cual (o sustituir por Octokit) |
@@ -149,16 +139,20 @@ Esto es lo que hace que la migración sea más que "cambiar controles por contro
 
 ### 6.2 Integración con el escritorio de Windows
 - **Jump lists** y **thumbnail toolbar** de la barra de tareas (`WindowsJumpListManager`, `WindowsThumbnailToolbarButton*`, `TaskbarProgress`).
-- **Shell extension** C++ (menú contextual del Explorador) — seguiría siendo Windows-only; en Linux/macOS serían integraciones distintas (Nautilus/Finder) o se pierde la feature.
-- `GitExtSshAskPass` (diálogo nativo Win32) — reescribible como pequeña app Avalonia.
-- Integración **PuTTY/pageant** para SSH (en Linux/macOS se usaría OpenSSH/ssh-agent, que git ya soporta; simplificación real).
-- Integración con **Visual Studio** vía COM (`EnvDTE`).
+- **Shell extension** C++ (menú contextual del Explorador) — permanece Windows-only y fuera de la shell Avalonia.
+- `GitExtSshAskPass` (diálogo nativo Win32) — se sustituirá por una implementación de la shell Avalonia cuando se aborde SSH.
+- Integración **PuTTY/pageant** — se sustituye por OpenSSH/`ssh-agent`, que git ya soporta.
+- Integración con **Visual Studio** vía COM (`EnvDTE`) — se retira con `GitUI`.
 
-### 6.3 La API de plugins expone tipos WinForms
-`GitExtensions.Extensibility` (contrato público) usa `IWin32Window`, `Form`, `System.Drawing.Image` en firmas (`IGitUICommands.StartXxxDialog(IWin32Window? owner, ...)`, `Func<Form>`, iconos como `Image`). **Migrar la UI implica romper/versionar la API de plugins** y todo el ecosistema de plugins externos (PluginManager). Un paso previo útil e independiente de Avalonia: abstraer esos tipos (p. ej. `IWindowHandle`, iconos como streams/URIs).
+### 6.3 API de plugins desacoplada
+`GitExtensions.Extensibility` ya no expone `IWin32Window`, `Form` ni `Image` en sus contratos.
+Los owners de diálogos usan `IWindow`, los iconos se transportan como `byte[]` PNG y los
+settings son declarativos. La API se rompió sin deprecaciones, conforme a la política del fork;
+la compatibilidad con plugins externos queda fuera de las primeras fases y los plugins se
+retomarán en Fase 4.
 
 ### 6.4 Sistema de traducción propio ligado a WinForms
-`ResourceManager` + `TranslationApp` traducen **recorriendo por reflexión los árboles de controles** de Forms/UserControls y volcando a `.xlf`. Con Avalonia/XAML el mecanismo cambia por completo (bindings a recursos, `x:Static`, o librerías tipo `Avalonia.Localizer`). Los `.xlf` existentes (≈20 idiomas) son reutilizables como *datos*, pero la tubería se reescribe.
+`ResourceManager` + `TranslationApp` traducen **recorriendo por reflexión los árboles de controles** de Forms/UserControls y volcando a `.xlf`. En Avalonia/XAML se usará una tubería nueva basada en recursos y bindings; los `.xlf` existentes (≈20 idiomas) se reutilizarán como datos en Fase 4.
 
 ### 6.5 Theming propio
 Temas como **CSS** (`GitUI/Themes/*.css`) parseados con ExCSS que remapean `SystemColors`/`AppColor` + hacks Win32 (`UxTheme`, subclassing) para dark mode. Avalonia trae theming real (Fluent, `ThemeVariant` claro/oscuro, DynamicResource): este subsistema entero se sustituye por algo más simple y estándar.
@@ -195,19 +189,27 @@ Nota: `GitCommands` invoca `git.exe` por línea de comandos (no LibGit2Sharp), l
 
 ---
 
-## 8. Estrategias posibles
+## 8. Estrategia vigente
 
-| Estrategia | Descripción | Valoración |
-|---|---|---|
-| **A. Port in-place** (form a form) | Sustituir WinForms por Avalonia dentro del mismo ejecutable | ❌ Inviable: no hay hosting estable WinForms↔Avalonia y no resolvería lo multiplataforma |
-| **B. Nueva shell Avalonia** ("strangler") | Nuevo proyecto `GitUI.Avalonia` (MVVM) que consume `GitCommands`/`GitExtUtils`/`Extensibility` refactorizada. La app WinForms sigue viva mientras la nueva alcanza paridad por fases (1º browse+grid+diff, luego diálogos) | ✅ **Recomendada**. Permite entregar valor incremental y valida el desacoplamiento del core desde el día 1 |
-| **C. Adoptar/contribuir a un cliente Avalonia existente** | P. ej. SourceGit (git GUI en Avalonia, MIT) y portarle features de GitExtensions | ⚠️ Menos control, pero esfuerzo órdenes de magnitud menor si el objetivo es "un GitExtensions-like multiplataforma" y no "migrar este código" |
+Se adopta de forma definitiva la **nueva shell Avalonia**: `GitExtensions.Avalonia` consume
+`GitCommands`, `GitExtUtils`, `GitExtensions.Extensibility` y `GitUIPluginInterfaces`, todos
+portable. La aplicación WinForms no se porta ni se convierte en una capa híbrida: queda en
+`GitExtensions.WinForms.slnx` como referencia funcional mientras la shell nueva gana capacidad
+por slices verticales.
 
-### Trabajo previo recomendado (independiente de Avalonia, reduce riesgo)
-1. **Limpiar la API de Extensibility** de tipos WinForms (`IWin32Window`, `Form`, `Image`) → abstracciones neutras.
-2. Extraer de `GitExtUtils` los interops de UI (`GitUI/*` dentro de ese proyecto) a un ensamblado Windows-only.
-3. Auditar `GitCommands` con `TargetFramework=net10.0` (sin `-windows`) como *canary* de multiplataforma: compilar y pasar sus tests en Linux en CI.
-4. ~~Introducir ViewModels/servicios testables detrás de los Forms más gordos (FormCommit, FormBrowse) — hoy la lógica de presentación vive en code-behind.~~ **Descartado en §10.3**: siendo fork independiente, los Forms WinForms se tiran enteros; la lógica de presentación se extrae bajo demanda al construir cada vista Avalonia.
+La migración de presentación se hace bajo demanda al construir cada vista Avalonia. No se
+introduce un retrofit de ViewModels en los Forms WinForms, porque esos Forms no son el destino
+de la arquitectura final.
+
+Orden ya ejecutado:
+
+1. CI propia y desacoplamiento del core (changes 0.1 a 0.4).
+2. MSDI común, proyecto Avalonia, JTF sobre Avalonia y delegates de shell (changes 1.0 a 1.1c).
+3. Solución cross-platform primaria e infraestructura de tests portable (change 1.1d).
+
+Siguiente entrega funcional: abrir un repositorio y mostrar su información básica (1.2),
+seguida de la lista plana virtualizada de commits (1.3). El grafo, el diff viewer y las
+operaciones de escritura permanecen en las fases posteriores indicadas en §10.3.
 
 ---
 
@@ -217,9 +219,12 @@ Nota: `GitCommands` invoca `git.exe` por línea de comandos (no LibGit2Sharp), l
 2. **RevisionGrid**: rendimiento del grafo con repos de cientos de miles de commits (hoy muy optimizado sobre GDI+/DataGridView virtual). Hay que reproducir virtualización y caché de render en Avalonia.
 3. **Ecosistema de plugins**: romper `GitUIPluginInterfaces`/`Extensibility` invalida plugins de terceros (PluginManager los distribuye por NuGet).
 4. **Traducciones**: la tubería XLIFF↔controles se reescribe; riesgo de perder los ~20 idiomas si no se migran los datos.
-5. **Features sin equivalente multiplataforma**: shell extension del Explorer, jump lists, ConEmu, integración VS, PuTTY — hay que decidir qué se pierde, qué se condiciona por SO y qué se reinventa.
-6. **VS-Threading**: 258 usos de `ThreadHelper` con reglas de hilo-UI verificadas por analizadores; funciona en Avalonia pero exige re-plumbing cuidadoso del `JoinableTaskContext`.
-7. **Testing**: los tests de UI actuales (`UI.IntegrationTests`) instancian Forms reales de WinForms; se rehacen con Avalonia.Headless.
+5. **Features sin equivalente multiplataforma**: shell extension del Explorer, jump lists, ConEmu e integración con Visual Studio quedan fuera de la shell Avalonia; SSH usa `ssh-agent`.
+6. **VS-Threading**: resuelto para la shell inicial. `JoinableTaskContext` se inicializa con el
+  `AvaloniaSynchronizationContext`; la cobertura funcional de cada flujo se ampliará al
+  construir las vistas.
+7. **Testing**: los tests de UI actuales (`UI.IntegrationTests`) instancian Forms reales de
+  WinForms; queda pendiente crear cobertura headless de la shell Avalonia.
 
 ---
 
@@ -230,15 +235,19 @@ Nota: `GitCommands` invoca `git.exe` por línea de comandos (no LibGit2Sharp), l
 ### 10.1 Modelo de trabajo: fork propio, sin upstreaming (2026-07-11)
 - No se contribuirá con PRs al proyecto upstream (`gitextensions/gitextensions`); todo el trabajo se hace en fork propio.
 - **Consecuencias que esto habilita:**
-  - El desacoplamiento del core (§8) se hace sin restricciones de compatibilidad: se puede **romper la API de plugins** directamente (eliminar `IWin32Window`/`Form`/`Image` de `Extensibility`) en lugar de abstraerla con ciclos de deprecación.
-  - Se pueden **eliminar** subsistemas Windows-only que no interesen (jump lists, integración VS/EnvDTE, telemetría AppInsights, ConEmu) en vez de condicionarlos por plataforma.
-  - El soporte de plugins de terceros (PluginManager) deja de ser una restricción; decidir más adelante si el fork mantiene ecosistema de plugins externo o solo los integrados.
+  - El desacoplamiento del core (§8) rompe directamente la API de plugins: se eliminan
+    `IWin32Window`/`Form`/`Image` de `Extensibility`, sin ciclos de deprecación.
+  - Los subsistemas Windows-only que no forman parte de la shell Avalonia (jump lists,
+    integración VS/EnvDTE, telemetría AppInsights y ConEmu) permanecen solo en la referencia
+    WinForms o se retiran con `GitUI`.
+  - El soporte de plugins de terceros (PluginManager) queda fuera de las primeras fases y se
+    retomará en Fase 4.
 - **Coste a vigilar:** `GitCommands` parsea la salida de `git` CLI, que evoluciona (formatos, mensajes, features nuevas). Conviene seguir absorbiendo fixes del upstream aunque no se contribuya.
 
 ### 10.2 Versión de partida: tag `v7.2.0` (2026-07-11)
 - Baseline: **tag `v7.2.0`** (creado 2026-07-10). En la fecha de la decisión, `master` upstream no tiene commits por delante del tag, así que es simultáneamente "última estable" y "punta de master".
 - Se descartan las ramas `release/X.Y` como base: son ramas de mantenimiento que solo reciben backports.
-- Rama de larga vida propuesta: `avalonia/main` creada desde `v7.2.0`.
+- Rama de larga vida: `avalonia/main`, creada desde `v7.2.0`.
 - **Política de sincronización:** absorber upstream por **tags de release** (v7.3.0, v8.0…), no commits diarios de master. Prioridad al sincronizar: `GitCommands`, `GitExtUtils`, `Extensibility` (el código reutilizado); los cambios de `GitUI` upstream dejarán de aplicar progresivamente.
 - Configuración de remotos recomendada: `origin` → fork propio; `upstream` → `gitextensions/gitextensions` (solo fetch).
 
@@ -247,7 +256,7 @@ v7.2.0 (== master upstream hoy)
    │
    ├── avalonia/main          ← rama de larga vida (fork)
    │      ├── fase 0: desacoplamiento core
-   │      └── fase 1: GitUI.Avalonia (vertical slice)
+   │      └── fase 1: GitExtensions.Avalonia (walking skeleton)
    │
    └── master (upstream) ──── v7.3.0 ──── v8.0
               se absorben tags, no commits diarios
@@ -258,19 +267,20 @@ v7.2.0 (== master upstream hoy)
   `git fetch upstream` + push) y `avalonia/main`. Las ramas del upstream siguen accesibles vía
   el remoto `upstream` si hicieran falta.
 
-### 10.3 Faseado revisado para desarrollo incremental con OpenSpec (2026-07-11)
+### 10.3 Faseado vigente y estado (revisado 2026-08-29)
 
-Revisión de la hoja de ruta original a la luz de la decisión de independencia total (§10.1) y
-de la adopción de OpenSpec como flujo de trabajo (un change = unidad pequeña, con
-propuesta/diseño aprobados antes de implementar y resultado verificable). Faseado vigente:
+El trabajo se organiza con OpenSpec (un change = unidad pequeña, con propuesta y diseño
+aprobados antes de implementar y resultado verificable). Este es el faseado vigente:
 
-- **Fase 0 — Cimientos**: 0.1 CI propia del fork (build + unit tests, Windows) → 0.2 limpiar
-  `Extensibility` de tipos WinForms → 0.3 extraer interops de UI de `GitExtUtils` → 0.4
-  canary multiplataforma (retarget `net10.0` + tests de `GitCommands` en Linux) → 0.5
-  (oportunista) purga de subsistemas sentenciados.
-- **Fase 1 — Walking skeleton Avalonia**: 1.1 app que arranca (MVVM, DI,
-  `JoinableTaskContext` sobre el `SynchronizationContext` de Avalonia, tema Fluent) → 1.2
-  abrir repositorio → 1.3 lista plana de commits virtualizada (sin grafo).
+- **Fase 0 — Cimientos: completada.** 0.1 CI propia del fork → 0.2 API de
+  `Extensibility` sin tipos WinForms → 0.3 extracción de interops a `GitExtUtils.WinForms` →
+  0.4 core en `net10.0` y tests de `GitCommands` en Linux. El 0.5 no se ejecuta como change
+  independiente: los subsistemas sentenciados quedan fuera de la shell Avalonia.
+- **Fase 1 — Walking skeleton Avalonia: infraestructura completada, funcionalidad pendiente.**
+  1.0 MSDI → 1.1a shell Avalonia mínima → 1.1b JTF sobre `AvaloniaSynchronizationContext` →
+  1.1c DI y delegates de shell → 1.1d solución primaria y tests core sin WinForms → 1.2
+  abrir repositorio → 1.3 lista plana de commits virtualizada (sin grafo). El siguiente change
+  es 1.2.
 - **Fase 2 — Vertical slice**: 2.1 grafo del RevisionGrid (`DrawingContext` sobre el modelo
   existente) → 2.2 refs/labels con hit-testing → 2.3 panel de ficheros → 2.4 diff viewer con
   AvaloniaEdit. *Hito: browse completo solo-lectura en Windows/Linux/macOS.*
@@ -279,17 +289,17 @@ propuesta/diseño aprobados antes de implementar y resultado verificable). Fasea
 - **Fase 4 — Plataforma y paridad**: localización (reutilizando datos `.xlf`), settings UI,
   plugins, empaquetado por SO, retirada de `GitUI` WinForms.
 
-**Justificación de los cambios respecto al plan original:**
+**Motivos de las decisiones consolidadas:**
 
 1. **Se descarta el retrofit de ViewModels en los Forms WinForms** (antiguo punto 4 de la
    Fase 0, y punto 4 del trabajo previo de §8). Tenía sentido con upstreaming o con una
    convivencia larga strangler; en un fork donde `GitUI` se elimina entero es trabajo perdido.
    La lógica de presentación se extraerá bajo demanda, al construir cada vista Avalonia.
-2. **La Fase 0 se reordena según las dependencias reales entre ensamblados**: el canary
-   multiplataforma de `GitCommands` exige antes limpiar `Extensibility` (expone
-   `IWin32Window`/`Form`/`Image`) y extraer los interops de `GitExtUtils`, porque `GitCommands`
-   depende de ambos. Orden: CI del fork → limpiar Extensibility → extraer interops → retarget
-   `net10.0` + tests de `GitCommands` en Linux (definition of done de la fase).
+2. **La Fase 0 se ordena según las dependencias reales entre ensamblados**: el canary
+  multiplataforma de `GitCommands` exige limpiar primero `Extensibility` y extraer los
+  interops de `GitExtUtils`, porque `GitCommands` depende de ambos. Orden: CI del fork →
+  limpiar Extensibility → extraer interops → retarget `net10.0` + tests de `GitCommands` en
+  Linux (definition of done de la fase).
 3. **Se añade una CI propia del fork como primer change** (0.1): sin ella, "pasar tests en
    Linux" no tiene dónde vivir y los changes posteriores no tienen verificación automática.
 4. **Se intercala un "walking skeleton" Avalonia (Fase 1) antes del vertical slice (Fase 2)**:
@@ -298,15 +308,13 @@ propuesta/diseño aprobados antes de implementar y resultado verificable). Fasea
    `JoinableTaskContext`, grafo owner-drawn, editor). El skeleton (app que arranca, abre repo,
    lista plana de commits virtualizada sin grafo) despeja la infraestructura y deja el change
    del grafo acotado a "solo el pintado".
-5. **Purga de subsistemas sentenciados solo oportunista** (0.5): AppInsights, EnvDTE, jump
-   lists se eliminan si estorban al desacoplamiento; si no, mueren con `GitUI`. ConEmu no se
-   toca: la app WinForms debe seguir usable como referencia funcional diaria durante toda la
-   migración.
-6. **Organización OpenSpec**: capabilities de `openspec/specs/` por área estable
-   (`core-decoupling`, `avalonia-shell`, `revision-grid`, `diff-viewer`, `git-operations`…),
-   no por fase. Decisiones transversales abiertas (toolkit MVVM — propuesta:
-   CommunityToolkit.Mvvm —, DI/composición, estrategia de localización) se trabajarán con
-   `openspec-explore` antes de sus changes.
+5. **Los subsistemas sentenciados quedan fuera de la shell Avalonia**: AppInsights, EnvDTE y
+  jump lists se retiran con `GitUI`; ConEmu se conserva únicamente para que la app WinForms
+  siga siendo la referencia funcional durante la migración.
+6. **Decisiones transversales cerradas:** `CommunityToolkit.Mvvm` para MVVM, MSDI para
+  composición, `FluentTheme` 11.3.18 para la shell, y delegates estáticos para los puntos de
+  integración síncronos del core. La localización se mantiene fuera de Fase 1 y reutilizará
+  los datos XLIFF en Fase 4.
 
 ### 10.4 Decisiones durante la implementación del change 0.1 — add-fork-ci (2026-07-11)
 
@@ -413,16 +421,13 @@ propuesta/diseño aprobados antes de implementar y resultado verificable). Fasea
 - **Referencias directas añadidas**: `GitUI.csproj` y `ResourceManager.csproj` ganan
   `ProjectReference` a `GitExtUtils.WinForms` — antes llegaba por transitividad desde
   `GitCommands`, cadena rota al retirar la referencia temporal.
-- **Tests multi-target**: `GitCommands.Tests` y `CommonTestUtils` ganan
-  `<TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>`. En `net10.0`:
-  `UseWindowsForms=false`, se excluyen `GitCommandHelpersTest.cs` (depende de
-  `ResourceManager.LocalizationHelpers`), `ConfigureJoinableTaskFactoryAttribute.cs`,
-  `WinFormsTestHelper.cs` y tests legacy de XML. `AssemblyInfo.cs` usa
-  `#if WINDOWS` para `ConfigureJoinableTaskFactory`. Resultado: ~3210/3450 tests pasan
-  en TFM neutro; los ~240 restantes necesitan `JoinableTaskContext` (no disponible sin la
-  infraestructura WinForms de tests). No se movió `LocalizationHelpers` al core (opción C
-  del design) porque depende de `TranslatedStrings` → infraestructura de traducción
-  completa; el multitarget fue más simple y suficiente para el canary.
+- **Tests multi-target**: `GitCommands.Tests` y `CommonTestUtils` se dejaron inicialmente con
+  `<TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>` para el canary. En `net10.0`
+  se excluyeron los tests ligados a `ResourceManager`, WinForms y la infraestructura de
+  threading de tests. `LocalizationHelpers` no se movió al core: al depender de la tubería de
+  traducción, se dejó como follow-up explícito. El change 1.1d completó después la migración
+  de la infraestructura a un único `net10.0`, recuperó `AsyncLoaderTests` y dejó
+  `GitCommands.Tests` pasando en la solución primaria.
 - **Linux CI**: `fork-ci.yml` gana job `verify-linux` (`ubuntu-latest`) con script
   `eng/Verify-Linux.ps1` que compila los 4 ensamblados core y ejecuta
   `dotnet test -f net10.0`. Requiere `-p:EnableWindowsTargeting=true` porque los proyectos
@@ -434,23 +439,21 @@ propuesta/diseño aprobados antes de implementar y resultado verificable). Fasea
   `GitCommands.Tests` pasa >90% de tests en Linux en CI. La app WinForms sigue compilando
   y pasando `eng/Verify.ps1` completo (15/15 suites). **Fase 0 completada.**
 
-### 10.8 Decisiones para la Fase 1 — Walking skeleton Avalonia (2026-07-25)
+### 10.8 Decisiones y resultado de la Fase 1 — Walking skeleton Avalonia (revisado 2026-08-29)
 
-Sesión de exploración con OpenSpec (`/opsx-explore`) para refinar el plan de Fase 1 antes de
-comenzar la implementación. El plan base (§10.3) definía tres bloques (1.1 proyecto que
-arranca, 1.2 abrir repo, 1.3 lista plana de commits). El análisis detallado reveló que 1.1
-empaquetaba varias decisiones de infraestructura con riesgos distintos y además faltaba un
-prerrequisito: migrar el `ServiceContainer` a `Microsoft.Extensions.DependencyInjection` (MSDI)
-en todo el código, no solo en la shell Avalonia.
+La Fase 1 se descompuso y se implementó en seis changes de infraestructura antes de construir
+vistas con lógica real. El resultado es una shell Avalonia portable, con DI, threading y
+delegates de plataforma funcionales, preparada para 1.2. No se ha implementado todavía la
+apertura de repositorios ni la lista de commits.
 
-#### Tecnologías seleccionadas
+#### Tecnologías adoptadas
 
 | Decisión | Elección | Justificación |
 |---|---|---|
-| Versión de Avalonia | **11.3.18** (última estable 11.x) | Estable, documentada, tooling maduro; 12.x es versión mayor con posibles cambios de API |
+| Versión de Avalonia | **11.3.18** | Línea estable adoptada para la shell |
 | MVVM toolkit | **CommunityToolkit.Mvvm** | Source generators (`[ObservableProperty]`, `[RelayCommand]`), ligero, compatible con C# 14 / .NET 10 |
 | Contenedor DI | **Microsoft.Extensions.DependencyInjection** (MSDI) | Estándar .NET, ligero, inyección por constructor, reemplaza `ServiceContainer` en todo el código (no solo la shell) |
-| Plugins | **Diferidos a Fase 4** | Mantener Fase 1 lean; la shell no referencia `GitUIPluginInterfaces` hasta que el esqueleto esté estable |
+| Plugins | **Diferidos a Fase 4** | La shell no incorpora el sistema de plugins durante el walking skeleton |
 | Tema | **Fluent** (claro/oscuro vía `ThemeVariant`) | Nativo de Avalonia, multiplataforma |
 
 #### Desglose refinado de la Fase 1
@@ -496,25 +499,16 @@ dependencias:
       Depende de: 1.2.
 ```
 
-#### Riesgos identificados
+#### Estado de los riesgos de Fase 1
 
-1. **`JoinableTaskContext` + Avalonia SyncContext** (change 1.1b): incertidumbre máxima. El
-   `JoinableTaskContext` captura `SynchronizationContext.Current` en su constructor; en Avalonia
-   el `AvaloniaSynchronizationContext` se instala durante el setup de la plataforma, entre
-   `Application.Initialize()` y `OnFrameworkInitializationCompleted()`. La hipótesis es que
-   funciona desde `OnFrameworkInitializationCompleted()`, pero hay que validarlo
-   experimentalmente (primer spike del change). Si no funciona, habrá que buscar alternativas
-   (custom factory, o reemplazar VS-Threading con algo más ligero para la shell nueva).
+1. **`JoinableTaskContext` + Avalonia SyncContext:** resuelto. Se inicializa en
+  `OnFrameworkInitializationCompleted()` y el spike de threading se validó manualmente.
 
-2. **Migración MSDI** (change 1.0): riesgo bajo pero alto volumen. `ServiceContainer` implementa
-   `IServiceProvider` igual que MSDI, así que los consumidores que usan `GetService<T>()` no
-   deberían romperse. El riesgo está en código que haga cast a `ServiceContainer` o llame a
-   `.AddService()` fuera de los métodos de registro.
+2. **Migración MSDI:** resuelta. Los registros usan `IServiceCollection`, las shells construyen
+  un `IServiceProvider` y no queda `ServiceContainer` en el código de producto.
 
-3. **Virtualización con repos grandes** (change 1.3): `RevisionReader` devuelve datos en
-   streaming (es `IEnumerable`), así que la paginación es cuestión de consumir bajo demanda.
-   El riesgo es la integración con el sistema de virtualización de Avalonia y el consumo de
-   memoria con cientos de miles de revisiones.
+3. **Virtualización con repos grandes:** sigue abierto y pertenece a 1.3. Se validará con
+  repositorios de 100K o más commits cuando exista la lista plana.
 
 #### Lo que NO incluye la Fase 1
 
@@ -526,6 +520,9 @@ dependencias:
 | Operaciones de escritura (commit, push…) | Fase 3 |
 | Localización | Fase 4 |
 | Empaquetado por SO | Fase 4 |
+
+Los únicos pendientes funcionales inmediatos de la Fase 1 son 1.2 y 1.3. El resto de las
+exclusiones anteriores son decisiones de alcance, no trabajo bloqueante de la shell.
 
 ### 10.9 Registro de changes implementados (tabla viva)
 
@@ -544,8 +541,24 @@ dependencias:
 | `di-shell-delegates` | 1.1c | 2026-07-30 | Contenedor MSDI + 3 delegates de shell cableados a diálogos Avalonia | `avalonia-di`, `avalonia-shell`, `avalonia-threading` |
 | `make-avalonia-solution-primary` | 1.1d | 2026-08-26 | `GitExtensions.slnx` = solución cross-platform primaria; CI simétrico Win/Linux; test infra del core sin WinForms (`SingleThreadSynchronizationContext`) | `solution-structure`, `continuous-integration`, `local-verification`, `cross-platform-core` |
 
+### 10.10 Backlog derivado de los NO GOALS
+
+Los siguientes puntos no son funcionalidad de la shell Avalonia ni bloquean el siguiente change,
+pero sí merecen una issue vinculada al milestone **Backlog Fase 1**:
+
+| Issue candidata | Motivo | Prioridad |
+|---|---|---|
+| Extraer `LocalizationHelpers` al core y recuperar sus dos tests cross-platform | El change 1.1d retiró esos tests al separar `ResourceManager`; el helper sigue ligado a la tubería de traducción y necesita una extracción deliberada | Media |
+| Añadir tests headless de la shell Avalonia | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
+
+El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
+RevisionGrid (Fase 2), diff viewer (Fase 2), operaciones de escritura (Fase 3), localización
+completa, plugins y empaquetado (Fase 4). La solución WinForms y sus tests se conservan como
+referencia, y los endurecimientos de CI (caché NuGet, SHA pinning y CI de macOS) quedan para
+una fase posterior.
+
 ## 11. Conclusión
 
 - El proyecto tiene una **separación core/UI mejor de lo habitual** en apps WinForms de esta edad: la lógica git (`GitCommands`) es portable casi tal cual, no depende de LibGit2 nativo (usa `git` CLI) y las librerías de infraestructura clave (VS-MEF, VS-Threading, Rx) son multiplataforma.
-- Aun así, **no existe un camino de "migración" barato**: la capa de presentación (≈70% del código) usa WinForms de forma profunda (owner-drawing, Win32, controles de terceros WinForms, traducción y theming acoplados a la jerarquía de controles) y habría que **reescribirla** en Avalonia, además de versionar la API pública de plugins.
-- Si el objetivo es tener GitExtensions multiplataforma, la ruta realista es la **estrategia B** (nueva shell Avalonia sobre el core existente) precedida por el trabajo de desacoplamiento del §8, empezando por un vertical slice: abrir repo → RevisionGrid → diff viewer, que es a la vez el mayor riesgo técnico y el 80% del valor de la aplicación.
+- Aun así, **no existe un camino de "migración" barato**: la capa de presentación (≈70% del código) usa WinForms de forma profunda (owner-drawing, Win32, controles de terceros WinForms, traducción y theming acoplados a la jerarquía de controles) y se reescribe en Avalonia; la API pública de plugins ya fue desacoplada rompiendo compatibilidad.
+- La ruta adoptada es una **nueva shell Avalonia sobre el core portable**, con la solución WinForms como referencia funcional. La Fase 0 está completada y la infraestructura de Fase 1 también; el siguiente change es 1.2, abrir un repositorio y mostrar su información básica, seguido de la lista plana de commits en 1.3.
