@@ -8,6 +8,7 @@ using GitExtensions.Extensibility;
 using GitExtensions.Extensibility.Settings;
 
 namespace GitCommandsTests.Git;
+[Platform(Include = "Win")]
 public sealed class ExecutableExtensionsTests
 {
     private MockExecutable _executable = null!;

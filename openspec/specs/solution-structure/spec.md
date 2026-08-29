@@ -24,7 +24,7 @@ proyectos Windows-only (`GitUI`, la app `GitExtensions`, `GitExtUtils.WinForms`,
 El repositorio SHALL conservar un fichero `GitExtensions.WinForms.slnx` en la raíz que contenga
 la solución WinForms completa (app `GitExtensions`, `GitUI`, `GitExtUtils.WinForms`,
 `ResourceManager`, externals y plugins) como material de consulta para el portado. Esta
-solución SHALL NOT ser compilada ni testeada por `eng/Verify.ps1`, `eng/Verify-Linux.ps1` ni
+solución SHALL NOT ser compilada ni testeada por `eng/Verify.ps1`, `eng/Verify-Linux.sh` ni
 por el workflow de CI (`fork-ci.yml`).
 
 #### Scenario: La solución de referencia existe
@@ -32,5 +32,5 @@ por el workflow de CI (`fork-ci.yml`).
 - **THEN** existe `GitExtensions.WinForms.slnx` listando los proyectos WinForms (p. ej. `GitUI`)
 
 #### Scenario: Fuera del CI
-- **WHEN** se inspeccionan `eng/Verify.ps1`, `eng/Verify-Linux.ps1` y `.github/workflows/fork-ci.yml`
+- **WHEN** se inspeccionan `eng/Verify.ps1`, `eng/Verify-Linux.sh` y `.github/workflows/fork-ci.yml`
 - **THEN** ninguno referencia `GitExtensions.WinForms.slnx`

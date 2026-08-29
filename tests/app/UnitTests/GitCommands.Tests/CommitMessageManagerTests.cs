@@ -216,6 +216,7 @@ public class CommitMessageManagerTests
         File.Exists(manager.CommitMessagePath).Should().BeTrue();
     }
 
+    [Platform(Include = "Win")]
     [TestCase("utf-8")]
     [TestCase("Utf-8")]
     [TestCase("UTF-8")]

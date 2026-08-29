@@ -6,6 +6,55 @@ namespace GitCommandsTests.Git_Commands;
 public class GitCommandsHelperTest
 {
     [Test]
+    public void GetRelativeDate_should_format_past_dates()
+    {
+        DateTime now = new(2026, 8, 29, 12, 0, 0);
+
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now)).Should().Be("0 seconds ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddSeconds(-1))).Should().Be("1 second ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(-1))).Should().Be("1 minute ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(-45))).Should().Be("1 hour ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddHours(-1))).Should().Be("1 hour ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-1))).Should().Be("1 day ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-7))).Should().Be("1 week ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-30))).Should().Be("1 month ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-364))).Should().Be("12 months ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-365))).Should().Be("1 year ago");
+
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddSeconds(-2))).Should().Be("2 seconds ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(-2))).Should().Be("2 minutes ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddHours(-2))).Should().Be("2 hours ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-2))).Should().Be("2 days ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-14))).Should().Be("2 weeks ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-60))).Should().Be("2 months ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(-730))).Should().Be("2 years ago");
+    }
+
+    [Test]
+    public void GetRelativeDate_should_format_future_dates()
+    {
+        DateTime now = new(2026, 8, 29, 12, 0, 0);
+
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddSeconds(1))).Should().Be("-1 second ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(1))).Should().Be("-1 minute ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(45))).Should().Be("-1 hour ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddHours(1))).Should().Be("-1 hour ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(1))).Should().Be("-1 day ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(7))).Should().Be("-1 week ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(30))).Should().Be("-1 month ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(364))).Should().Be("-12 months ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(365))).Should().Be("-1 year ago");
+
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddSeconds(2))).Should().Be("-2 seconds ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddMinutes(2))).Should().Be("-2 minutes ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddHours(2))).Should().Be("-2 hours ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(2))).Should().Be("-2 days ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(14))).Should().Be("-2 weeks ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(60))).Should().Be("-2 months ago");
+        FormatEnglish(LocalizationHelpers.GetRelativeDate(now, now.AddDays(730))).Should().Be("-2 years ago");
+    }
+
+    [Test]
     public void TestFetchArguments()
     {
         using ReferenceRepository referenceRepository = new(createCommit: false);
@@ -91,5 +140,22 @@ public class GitCommandsHelperTest
     {
         GitItemStatus item = new("name");
         StagedStatus.Unset.Should().Be(item.Staged);
+    }
+
+    private static string FormatEnglish(RelativeDate relativeDate)
+    {
+        string unit = relativeDate.Unit switch
+        {
+            RelativeDateUnit.Seconds => "second",
+            RelativeDateUnit.Minutes => "minute",
+            RelativeDateUnit.Hours => "hour",
+            RelativeDateUnit.Days => "day",
+            RelativeDateUnit.Weeks => "week",
+            RelativeDateUnit.Months => "month",
+            RelativeDateUnit.Years => "year",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        return $"{relativeDate.Value} {unit}{(Math.Abs(relativeDate.Value) == 1 ? "" : "s")} ago";
     }
 }

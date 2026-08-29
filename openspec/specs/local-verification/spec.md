@@ -38,7 +38,7 @@ tests de plugins) ni los proyectos de `tests/app/IntegrationTests/`.
 
 #### Scenario: Simetría con Linux
 - **WHEN** se ejecuta `.\eng\Verify.ps1` en Windows
-- **THEN** corre los mismos proyectos de test que `eng/Verify-Linux.ps1` en Linux
+- **THEN** corre los mismos proyectos de test que `eng/Verify-Linux.sh` en Linux
 
 ### Requirement: Configuración parametrizable
 El script SHALL aceptar un parámetro `-Configuration` con valores `Release` (por defecto) y

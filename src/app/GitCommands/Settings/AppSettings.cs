@@ -264,6 +264,11 @@ public static partial class AppSettings
 
     private static bool ReadBoolRegKey(string key, bool defaultValue)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return SettingsContainer.GetBool(key, defaultValue);
+        }
+
         object? obj = VersionIndependentRegKey.GetValue(key);
         if (obj is not string)
         {
@@ -280,17 +285,34 @@ public static partial class AppSettings
 
     private static void WriteBoolRegKey(string key, bool value)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            SettingsContainer.SetBool(key, value);
+            return;
+        }
+
         VersionIndependentRegKey.SetValue(key, value ? "true" : "false");
     }
 
     [return: NotNullIfNotNull(nameof(defaultValue))]
     private static string? ReadStringRegValue(string key, string? defaultValue)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return SettingsContainer.GetString(key, defaultValue);
+        }
+
         return (string?)VersionIndependentRegKey.GetValue(key, defaultValue);
     }
 
     private static void WriteStringRegValue(string key, string value)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            SettingsContainer.SetString(key, value);
+            return;
+        }
+
         VersionIndependentRegKey.SetValue(key, value);
     }
 
@@ -1665,7 +1687,7 @@ public static partial class AppSettings
             SettingsContainer.LockedAction(() =>
             {
                 // prepend "Global\" in order to be safe in preparation for non-Windows OS, too
-                _globalMutex ??= new Mutex(initiallyOwned: false, name: @$"Global\Mutex{SettingsFilePath.ToPosixPath()}");
+                _globalMutex ??= new Mutex(initiallyOwned: false, name: OperatingSystem.IsWindows() ? @$"Global\Mutex{SettingsFilePath.ToPosixPath()}" : null);
 
                 try
                 {
@@ -2140,6 +2162,11 @@ public static partial class AppSettings
 
     private static void ImportFromRegistry()
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
         SettingsContainer.SettingsCache.Import(GetSettingsFromRegistry());
     }
 

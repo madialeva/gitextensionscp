@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER && !UNIT_TEST
 [assembly: System.Runtime.Versioning.SupportedOSPlatform("windows7.0")]
 #endif
 

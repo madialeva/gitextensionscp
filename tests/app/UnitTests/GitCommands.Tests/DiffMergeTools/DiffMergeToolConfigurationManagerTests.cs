@@ -6,6 +6,7 @@ using GitExtensions.Extensibility.Configurations;
 using NSubstitute;
 
 namespace GitCommandsTests.DiffMergeTools;
+[Platform(Include = "Win")]
 public class DiffMergeToolConfigurationManagerTests
 {
     private const string DiffToolName = "customDiffTool";

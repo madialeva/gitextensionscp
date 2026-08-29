@@ -2,7 +2,7 @@
 
 ## Purpose
 Verificación automática del fork en GitHub Actions: cada push/PR a `avalonia/main` ejecuta
-la misma verificación que en local (`eng/Verify.ps1` en Windows, `eng/Verify-Linux.ps1` en
+la misma verificación que en local (`eng/Verify.ps1` en Windows, `eng/Verify-Linux.sh` en
 Linux), sobre máquina limpia. Establecida por el change 0.1 (`add-fork-ci`); ampliada con
 pata Linux en el change 0.4 (`canary-multiplatform`); ampliada con el proyecto Avalonia en el change 1.1a (`hello-avalonia`).
 
@@ -33,7 +33,7 @@ propia de compilación o selección de tests.
 - **THEN** el mismo commit pasa en el job `verify-windows`
 
 #### Scenario: Paridad local/CI (Linux)
-- **WHEN** `eng/Verify-Linux.ps1` pasa en una máquina local limpia con submódulos inicializados
+- **WHEN** `eng/Verify-Linux.sh` pasa en una máquina local limpia con submódulos inicializados
 - **THEN** el mismo commit pasa en el job `verify-linux`
 
 ### Requirement: Diagnóstico de fallos descargable
@@ -45,7 +45,7 @@ verificación falle.
 - **THEN** la página del run ofrece un artifact descargable con los `.trx` generados
 
 ### Requirement: Verificación en Linux (canary multiplataforma)
-El workflow SHALL contener un job `verify-linux` que ejecute `eng/Verify-Linux.ps1` en un
+El workflow SHALL contener un job `verify-linux` que ejecute `eng/Verify-Linux.sh` en un
 runner `ubuntu-latest`: compilación de la solución cross-platform `GitExtensions.slnx` y
 ejecución del subset `net10.0` de `GitCommands.Tests`, de forma simétrica con el job Windows.
 
@@ -71,13 +71,13 @@ nuevo push a esa misma rama.
 - **WHEN** se hace push a `avalonia/main` mientras el run del push anterior sigue en curso
 - **THEN** el run anterior se cancela y solo el nuevo llega a completarse
 
-### Requirement: Script Verify-Linux.ps1 compila el proyecto Avalonia
-El script `eng/Verify-Linux.ps1` SHALL compilar la solución cross-platform `GitExtensions.slnx`
+### Requirement: Script Verify-Linux.sh compila el proyecto Avalonia
+El script `eng/Verify-Linux.sh` SHALL compilar la solución cross-platform `GitExtensions.slnx`
 (que incluye `src/app/GitExtensions.Avalonia/GitExtensions.Avalonia.csproj`) en lugar de una
 lista hardcodeada de proyectos core.
 
 #### Scenario: Proyecto Avalonia en lista de coreProjects
-- **WHEN** se inspecciona `eng/Verify-Linux.ps1`
+- **WHEN** se inspecciona `eng/Verify-Linux.sh`
 - **THEN** la variable `$solution` apunta a `GitExtensions.slnx` (que incluye
   `src/app/GitExtensions.Avalonia/GitExtensions.Avalonia.csproj`) y no existe una lista
   `$coreProjects` hardcodeada
@@ -88,7 +88,7 @@ lista hardcodeada de proyectos core.
   "VERIFY-LINUX FAILED"
 
 ### Requirement: La solución WinForms queda fuera del CI
-El workflow `fork-ci.yml` y los scripts `eng/Verify.ps1` y `eng/Verify-Linux.ps1` SHALL NOT
+El workflow `fork-ci.yml` y los scripts `eng/Verify.ps1` y `eng/Verify-Linux.sh` SHALL NOT
 compilar ni testear la solución WinForms (`GitExtensions.WinForms.slnx`) ni ningún proyecto
 Windows-only (`GitUI`, la app `GitExtensions`, `GitExtUtils.WinForms`, `ResourceManager`,
 `BugReporter`, externals o plugins). Ambos jobs SHALL validar la misma solución cross-platform.
@@ -98,6 +98,6 @@ Windows-only (`GitUI`, la app `GitExtensions`, `GitExtUtils.WinForms`, `Resource
 - **THEN** ambos compilan `GitExtensions.slnx` y ejecutan `GitCommands.Tests` con `-f net10.0`
 
 #### Scenario: Sin proyectos Windows-only en CI
-- **WHEN** se inspecciona `fork-ci.yml`, `eng/Verify.ps1` y `eng/Verify-Linux.ps1`
+- **WHEN** se inspecciona `fork-ci.yml`, `eng/Verify.ps1` y `eng/Verify-Linux.sh`
 - **THEN** ninguno referencia `GitExtensions.WinForms.slnx`, `GitUI.csproj` ni
   `GitExtensions.csproj` (la app WinForms)

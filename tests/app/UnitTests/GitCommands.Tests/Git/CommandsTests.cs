@@ -20,6 +20,7 @@ public partial class CommandsTests
         yield return new TestCaseData("-c protocol.file.allow=always ", Commands.GetAllowFileConfig());
     }
 
+    [Platform(Include = "Win")]
     [Test, TestCaseSource(nameof(AddSubmoduleTestCases))]
     public void AddSubmoduleCmd(string config, IEnumerable<GitConfigItem> configs)
     {
@@ -32,6 +33,7 @@ public partial class CommandsTests
         Commands.AddSubmodule("remote\\path", "local\\path", "branch", force: true, configs).Arguments.Should().Be($"{config}submodule add -f -b \"branch\" \"remote/path\" \"local/path\"");
     }
 
+    [Platform(Include = "Win")]
     [Test]
     public void ApplyDiffPatchCmd()
     {
@@ -39,6 +41,7 @@ public partial class CommandsTests
         Commands.ApplyDiffPatch(true, "hello\\world.patch", PathUtil.ToPosixPath).Arguments.Should().Be("apply --ignore-whitespace \"hello/world.patch\"");
     }
 
+    [Platform(Include = "Win")]
     [TestCase(false, false, "hello\\world.patch", "am --3way \"hello/world.patch\"")]
     [TestCase(false, true, "hello\\world.patch", "am --3way --ignore-whitespace \"hello/world.patch\"")]
     [TestCase(true, false, "hello\\world.patch", "am --3way --signoff \"hello/world.patch\"")]
@@ -251,6 +254,7 @@ public partial class CommandsTests
         Commands.GetRefs(getRefs, noLocks, sortBy, sortOrder, count).ToString().Should().Be(expected);
     }
 
+    [Platform(Include = "Win")]
     // Don't care about permutations because the args aren't correlated
     [TestCase(false, false, false, null, false, null, null, "merge --no-ff --no-edit branch")]
     [TestCase(true, true, true, null, true, null, null, "merge --squash --no-commit --allow-unrelated-histories --no-edit branch")]
@@ -321,6 +325,7 @@ public partial class CommandsTests
         return Commands.PushLocal(gitRef, ObjectId.WorkTreeId, repoDir, PathUtil.ToPosixPath, force, dryRun).Arguments!;
     }
 
+    [Platform(Include = "Win")]
     [Test]
     public void PushTagCmd()
     {

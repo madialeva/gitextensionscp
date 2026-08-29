@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Threading;
 
 namespace GitCommandsTests;
 
+[Platform(Include = "Win")]
 public sealed class ExecutableTests
 {
     [SetUp]

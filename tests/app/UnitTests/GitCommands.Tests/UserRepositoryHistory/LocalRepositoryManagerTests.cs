@@ -6,6 +6,7 @@ using IRepositoryStorage = GitCommands.UserRepositoryHistory.IRepositoryStorage;
 using Repository = GitCommands.UserRepositoryHistory.Repository;
 
 namespace GitCommandsTests.UserRepositoryHistory;
+[Platform(Include = "Win")]
 public class LocalRepositoryManagerTests
 {
     private const string KeyRecentHistory = "history";

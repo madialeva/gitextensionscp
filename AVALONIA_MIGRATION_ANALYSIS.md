@@ -548,7 +548,6 @@ pero sí merecen seguimiento en el milestone **Phase 1 Backlog**:
 
 | Issue | Motivo | Prioridad |
 |---|---|---|
-| [#19 Extract `LocalizationHelpers` into the portable core](https://github.com/madialeva/gitextensionscp/issues/19) | El change 1.1d retiró esos tests al separar `ResourceManager`; el helper sigue ligado a la tubería de traducción y necesita una extracción deliberada | Media |
 | [#20 Add headless tests for Avalonia shell startup and platform delegates](https://github.com/madialeva/gitextensionscp/issues/20) | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
 
 El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
@@ -556,6 +555,17 @@ RevisionGrid (Fase 2), diff viewer (Fase 2), operaciones de escritura (Fase 3), 
 completa, plugins y empaquetado (Fase 4). La solución WinForms y sus tests se conservan como
 referencia, y los endurecimientos de CI (caché NuGet, SHA pinning y CI de macOS) quedan para
 una fase posterior.
+
+### 10.11 Resultado de #19 — LocalizationHelpers portable (2026-08-29)
+
+`LocalizationHelpers` se separó en dos responsabilidades: `GitCommands` posee el cálculo
+portable de unidad/valor relativo y el formato de fecha completa; `ResourceManager` conserva el
+adaptador que traduce esos valores mediante `TranslatedStrings`. Los dos tests de fechas
+relativas volvieron a `GitCommands.Tests` sin referencia a `ResourceManager` y pasan bajo
+`net10.0`.
+
+La verificación Linux pasó a `eng/Verify-Linux.sh`, ejecutable con Bash y con paridad de
+configuración, build, tests, resultados TRX y códigos de salida respecto al script anterior.
 
 ## 11. Conclusión
 

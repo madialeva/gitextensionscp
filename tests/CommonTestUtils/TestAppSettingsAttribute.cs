@@ -7,7 +7,7 @@ namespace CommonTestUtils;
 [AttributeUsage(AttributeTargets.Assembly)]
 public sealed class TestAppSettingsAttribute : Attribute, ITestAction
 {
-    private readonly Semaphore _semaphore = new(initialCount: 1, maximumCount: 1, "GitExtensionsTestAssemblySerializer");
+    private readonly Semaphore _semaphore = new(initialCount: 1, maximumCount: 1, name: OperatingSystem.IsWindows() ? "GitExtensionsTestAssemblySerializer" : null);
 
     public ActionTargets Targets => ActionTargets.Suite;
 

@@ -76,6 +76,7 @@ public class GitDirectoryResolverTests
         _directory.DidNotReceive().Exists(_gitWorkingDir);
     }
 
+    [Platform(Include = "Win")]
     [Test]
     public void Resolve_should_return_resolved_full_path_from_git_file_if_present()
     {
@@ -95,6 +96,7 @@ public class GitDirectoryResolverTests
         _resolver.Resolve(helper.Module.WorkingDir).Should().Be(helper.Module.WorkingDirGitDir);
     }
 
+    [Platform(Include = "Win")]
     [Test]
     public void Resolve_submodule_real_filesystem()
     {

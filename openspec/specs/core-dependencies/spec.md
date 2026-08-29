@@ -65,5 +65,5 @@ Los cambios de desacoplamiento SHALL NOT cambiar el comportamiento de la aplicac
 - **THEN** la build está limpia y los 15 proyectos de unit tests pasan
 
 #### Scenario: Verificación en Linux
-- **WHEN** se ejecuta `eng/Verify-Linux.ps1` en un runner Linux
+- **WHEN** se ejecuta `eng/Verify-Linux.sh` en un runner Linux
 - **THEN** los ensamblados core compilan y los tests de `GitCommands` (subset `net10.0`) pasan

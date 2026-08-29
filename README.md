@@ -45,6 +45,13 @@ cd gitextensionscp
 dotnet build
 ```
 
+On Linux, run the cross-platform verification directly with Bash:
+
+```bash
+bash eng/Verify-Linux.sh
+bash eng/Verify-Linux.sh Debug
+```
+
 The new cross-platform Avalonia shell (under development) is built at
 `artifacts/Debug/bin/GitExtensions.Avalonia/net10.0/GitExtensions.Avalonia.dll`
 (run with `dotnet run --project src/app/GitExtensions.Avalonia`).
