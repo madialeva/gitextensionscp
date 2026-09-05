@@ -25,7 +25,7 @@ public partial class App : Application
 
         AvaloniaAppComposition composition = new(() => MainWindow);
         ServiceProvider = composition.BuildServiceProvider();
-        composition.InstallPlatformDelegates();
+        composition.InstallPlatformDelegates(ServiceProvider);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

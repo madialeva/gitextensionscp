@@ -28,4 +28,10 @@
     <ProjectReference Include="..\GitCommands\GitCommands.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\GitUI\Translation\*.xlf"
+                      Exclude="..\GitUI\Translation\*.Plugins.xlf"
+                      Link="Localization\%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

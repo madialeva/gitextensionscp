@@ -1,5 +1,7 @@
 using System.IO.Abstractions;
 using GitCommands;
+using GitExtensions.Avalonia;
+using GitExtensions.Avalonia.Localization;
 using GitExtUtils;
 using GitUI;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +29,15 @@ public sealed class AvaloniaStartupTests
     public void OnFrameworkInitializationCompleted_should_register_portable_services()
     {
         App.ServiceProvider.GetRequiredService<IFileSystem>().Should().NotBeNull();
+
+        AvaloniaLocalizationService localization = App.ServiceProvider.GetRequiredService<AvaloniaLocalizationService>();
+        localization["OpenRepository"].Should().Be("Open repository");
+
+        RepositoryShellViewModel viewModel = App.ServiceProvider.GetRequiredService<RepositoryShellViewModel>();
+        int notificationCount = 0;
+        viewModel.PropertyChanged += (_, _) => notificationCount++;
+        localization.SetCulture("es").Should().BeTrue();
+        notificationCount.Should().BeGreaterThan(0);
     }
 
     [Test]
