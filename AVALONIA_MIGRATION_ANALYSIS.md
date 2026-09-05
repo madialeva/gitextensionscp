@@ -541,6 +541,7 @@ exclusiones anteriores son decisiones de alcance, no trabajo bloqueante de la sh
 | `di-shell-delegates` | 1.1c | 2026-07-30 | Contenedor MSDI + 3 delegates de shell cableados a diálogos Avalonia | `avalonia-di`, `avalonia-shell`, `avalonia-threading` |
 | `make-avalonia-solution-primary` | 1.1d | 2026-08-26 | `GitExtensions.slnx` = solución cross-platform primaria; CI simétrico Win/Linux; test infra del core sin WinForms (`SingleThreadSynchronizationContext`) | `solution-structure`, `continuous-integration`, `local-verification`, `cross-platform-core` |
 | `extract-localizationhelpers-linux-verification` | 1.1e | 2026-08-29 | Cálculo portable de fechas, tests `net10.0` y verificación Linux con Bash | `cross-platform-core`, `local-verification`, `continuous-integration` |
+| `open-repository-main-shell` | 1.2 | 2026-09-05 | Shell Avalonia IDE-like, apertura de repositorios, información Git básica y tests headless | `avalonia-di`, `avalonia-shell`, `avalonia-main-shell`, `avalonia-repository-opening`, `avalonia-headless-testing` |
 
 ### 10.10 Backlog derivado de los NO GOALS
 
@@ -549,7 +550,6 @@ pero sí merecen seguimiento en el milestone **Phase 1 Backlog**:
 
 | Issue | Motivo | Prioridad |
 |---|---|---|
-| [#20 Add headless tests for Avalonia shell startup and platform delegates](https://github.com/madialeva/gitextensionscp/issues/20) | Verificar startup, resolución DI, `ExceptionReporter`, `ShowError`, `PickFolder` y la inicialización JTF antes de abrir repositorios | Media-alta |
 | [#22 Migrate localization infrastructure and decouple translated resources](https://github.com/madialeva/gitextensionscp/issues/22) | El change #19 dejó fuera la migración de la infraestructura completa de localización/XLIFF y el desacoplamiento de `TranslatedStrings` para la shell Avalonia | Media |
 
 El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
@@ -573,4 +573,4 @@ configuración, build, tests, resultados TRX y códigos de salida respecto al sc
 
 - El proyecto tiene una **separación core/UI mejor de lo habitual** en apps WinForms de esta edad: la lógica git (`GitCommands`) es portable casi tal cual, no depende de LibGit2 nativo (usa `git` CLI) y las librerías de infraestructura clave (VS-MEF, VS-Threading, Rx) son multiplataforma.
 - Aun así, **no existe un camino de "migración" barato**: la capa de presentación (≈70% del código) usa WinForms de forma profunda (owner-drawing, Win32, controles de terceros WinForms, traducción y theming acoplados a la jerarquía de controles) y se reescribe en Avalonia; la API pública de plugins ya fue desacoplada rompiendo compatibilidad.
-- La ruta adoptada es una **nueva shell Avalonia sobre el core portable**, con la solución WinForms como referencia funcional. La Fase 0 está completada y la infraestructura de Fase 1 también; el siguiente change es 1.2, abrir un repositorio y mostrar su información básica, seguido de la lista plana de commits en 1.3.
+- La ruta adoptada es una **nueva shell Avalonia sobre el core portable**, con la solución WinForms como referencia funcional. La Fase 0 está completada y el change 1.2 ha validado la shell y la apertura de repositorios; el siguiente change es 1.3, la lista plana de commits virtualizada.
