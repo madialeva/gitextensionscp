@@ -4,12 +4,40 @@
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource ShellTextBrush}" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="Foreground" Value="{DynamicResource ShellTextBrush}" />
+        </Style>
         <Style Selector="Button.rail-button">
-            <Setter Property="Width" Value="40" />
-            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="FontSize" Value="18" />
             <Setter Property="Margin" Value="0,4" />
+        </Style>
+        <Style Selector="Button.rail-button:pointerover">
+            <Setter Property="Background" Value="#151A20" />
+            <Setter Property="BorderBrush" Value="#151A20" />
+        </Style>
+        <Style Selector="Button.rail-button:pressed">
+            <Setter Property="Background" Value="#20262E" />
+            <Setter Property="BorderBrush" Value="#20262E" />
+        </Style>
+        <Style Selector="Button.rail-button:disabled">
+            <Setter Property="Background" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="Foreground" Value="#68717D" />
+            <Setter Property="Opacity" Value="0.45" />
+        </Style>
+        <Style Selector="Button.rail-button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ShellRailBrush}" />
+            <Setter Property="Foreground" Value="#68717D" />
         </Style>
         <Style Selector="Button.chrome-button">
             <Setter Property="Width" Value="42" />
@@ -21,6 +49,7 @@
         <SolidColorBrush x:Key="ShellInteriorBrush" Color="#30343A" />
         <SolidColorBrush x:Key="ShellHeaderBrush" Color="#1C2025" />
         <SolidColorBrush x:Key="ShellRailBrush" Color="#080A0D" />
+        <SolidColorBrush x:Key="ShellTextBrush" Color="#E6D6A3" />
         <SolidColorBrush x:Key="ShellSeparatorBrush" Color="#B8C0CC" />
         <StreamGeometry x:Key="WelcomeGeometry">M12,5.69 17,10.19 17,18 15,18 15,12 9,12 9,18 7,18 7,10.19 12,5.69 M12,3 2,12 5,12 5,20 11,20 11,14 13,14 13,20 19,20 19,12 22,12 12,3</StreamGeometry>
         <StreamGeometry x:Key="OpenRepositoryGeometry">M19.5,20 4,20 C2.9,20 2,19.1 2,18 L2,6 C2,4.9 2.9,4 4,4 L10,4 12,6 20,6 C21.1,6 22,6.9 22,8 L20,18 19.5,20 M4,8 21.5,8 19.5,18 4,18 4,8</StreamGeometry>

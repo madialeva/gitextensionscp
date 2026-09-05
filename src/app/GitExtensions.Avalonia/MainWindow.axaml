@@ -30,10 +30,10 @@
                 <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource ShellRailBrush}" BorderThickness="0">
                         <StackPanel HorizontalAlignment="Center" Margin="0,12">
                                 <Button Classes="rail-button" ToolTip.Tip="{Binding Localization[Welcome]}" Command="{Binding ShowWelcomeCommand}">
-                                        <PathIcon Data="{DynamicResource WelcomeGeometry}" Width="20" Height="20" />
+                                        <PathIcon Data="{DynamicResource WelcomeGeometry}" Width="28" Height="28" />
                                 </Button>
                                 <Button Classes="rail-button" ToolTip.Tip="{Binding Localization[OpenRepository]}" Command="{Binding OpenFolderCommand}">
-                                        <PathIcon Data="{DynamicResource OpenRepositoryGeometry}" Width="20" Height="20" />
+                                        <PathIcon Data="{DynamicResource OpenRepositoryGeometry}" Width="28" Height="28" />
                                 </Button>
                         </StackPanel>
                 </Border>
@@ -81,7 +81,7 @@
                 <Border Grid.Row="1" Grid.Column="2" Background="{DynamicResource ShellRailBrush}" BorderThickness="0">
                         <StackPanel HorizontalAlignment="Center" Margin="0,12">
                                 <Button Classes="rail-button" ToolTip.Tip="{Binding Localization[RepositoryInformation]}" IsEnabled="{Binding HasRepository}" Command="{Binding ShowRepositoryInformationCommand}">
-                                        <PathIcon Data="{DynamicResource RepositoryInformationGeometry}" Width="20" Height="20" />
+                                        <PathIcon Data="{DynamicResource RepositoryInformationGeometry}" Width="28" Height="28" />
                                 </Button>
                         </StackPanel>
                 </Border>
