@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using GitCommands;
 using GitCommands.Git;
+using GitExtensions.Avalonia.Services;
 using GitExtUtils;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,12 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<IGitDirectoryResolver>(gitDirectoryResolver);
 
         services.AddGitCommands();
+        services.AddSingleton<IRepositoryHistoryPort, ProductionRepositoryHistoryPort>();
+        services.AddSingleton<IRepositoryReader, GitRepositoryReader>();
+        services.AddSingleton<IRepositoryFolderPicker>(sp =>
+            new ProductionRepositoryFolderPicker(() => App.MainWindow));
+        services.AddSingleton<RepositoryOpeningService>();
+        services.AddSingleton<RepositoryShellViewModel>();
 
         return services;
     }

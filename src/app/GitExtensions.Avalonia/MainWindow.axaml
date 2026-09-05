@@ -2,6 +2,92 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="GitExtensions.Avalonia.MainWindow"
         Title="GitExtensions"
-        Width="800"
-        Height="600">
+                Width="1100"
+                Height="700"
+                MinWidth="720"
+                MinHeight="480"
+                SystemDecorations="None"
+                Background="{DynamicResource ShellInteriorBrush}"
+                >
+        <Grid RowDefinitions="52,*,30" ColumnDefinitions="56,*,56">
+                <Border Grid.Row="0" Grid.ColumnSpan="3" Background="{DynamicResource ShellHeaderBrush}" BorderBrush="{DynamicResource ShellSeparatorBrush}" BorderThickness="0,0,0,1" PointerPressed="WindowPointerPressed">
+                        <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Text="GitExtensions" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" Margin="18,0" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button x:Name="MinimizeButton" Classes="chrome-button" ToolTip.Tip="Minimize" Click="MinimizeClick">
+                                                <PathIcon Data="{DynamicResource MinimizeGeometry}" Width="16" Height="16" />
+                                        </Button>
+                                        <Button x:Name="MaximizeButton" Classes="chrome-button" ToolTip.Tip="Maximize or restore" Click="MaximizeClick">
+                                                <PathIcon Data="{DynamicResource MaximizeGeometry}" Width="16" Height="16" />
+                                        </Button>
+                                        <Button Classes="chrome-button" ToolTip.Tip="Close" Click="CloseClick">
+                                                <PathIcon Data="{DynamicResource CloseGeometry}" Width="16" Height="16" />
+                                        </Button>
+                                </StackPanel>
+                        </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource ShellRailBrush}" BorderThickness="0">
+                        <StackPanel HorizontalAlignment="Center" Margin="0,12">
+                                <Button Classes="rail-button" ToolTip.Tip="Welcome" Command="{Binding ShowWelcomeCommand}">
+                                        <PathIcon Data="{DynamicResource WelcomeGeometry}" Width="20" Height="20" />
+                                </Button>
+                                <Button Classes="rail-button" ToolTip.Tip="Open repository" Command="{Binding OpenFolderCommand}">
+                                        <PathIcon Data="{DynamicResource OpenRepositoryGeometry}" Width="20" Height="20" />
+                                </Button>
+                        </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource ShellInteriorBrush}" Padding="28,24">
+                        <Grid RowDefinitions="Auto,*">
+                                <StackPanel IsVisible="{Binding IsWelcome}">
+                                        <TextBlock Text="Open a repository" FontSize="28" FontWeight="SemiBold" />
+                                        <TextBlock Text="Choose a recent repository or browse for a folder." Opacity="0.72" Margin="0,8,0,20" />
+                                        <Button Content="Browse for folder" Command="{Binding OpenFolderCommand}" HorizontalAlignment="Left" />
+                                        <TextBlock Text="Recent repositories" FontSize="17" FontWeight="SemiBold" Margin="0,32,0,10" />
+                                        <ItemsControl ItemsSource="{Binding RecentRepositories}">
+                                                <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                                <Button Content="{Binding Path}" Command="{Binding $parent[ItemsControl].DataContext.OpenRecentCommand}" CommandParameter="{Binding}" HorizontalContentAlignment="Left" Margin="0,3" />
+                                                        </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" IsVisible="{Binding IsBusy}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <ProgressBar IsIndeterminate="True" Width="240" />
+                                        <TextBlock Text="Opening repository..." HorizontalAlignment="Center" Margin="0,12" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" IsVisible="{Binding HasRepository}" Spacing="10">
+                                        <TextBlock Text="Repository" FontSize="28" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding ActiveRepository.Path}" TextWrapping="Wrap" Opacity="0.75" />
+                                        <TextBlock Text="{Binding ActiveRepository.Branch, StringFormat='Branch: {0}'}" Margin="0,18,0,0" />
+                                            <TextBlock Text="{Binding ActiveRepository.RemoteSummary, StringFormat='Remotes: {0}'}" />
+                                        <TextBlock Text="{Binding ActiveRepository.WorkingTreeSummary}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" IsVisible="{Binding HasError}" Spacing="10" Margin="0,220,0,0">
+                                        <TextBlock Text="Unable to open repository" FontSize="20" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" />
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Button Content="Retry" Command="{Binding RetryCommand}" />
+                                                <Button Content="Choose another folder" Command="{Binding OpenFolderCommand}" />
+                                        </StackPanel>
+                                </StackPanel>
+                        </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="2" Background="{DynamicResource ShellRailBrush}" BorderThickness="0">
+                        <StackPanel HorizontalAlignment="Center" Margin="0,12">
+                                <Button Classes="rail-button" ToolTip.Tip="Repository information" IsEnabled="{Binding HasRepository}" Command="{Binding ShowRepositoryInformationCommand}">
+                                        <PathIcon Data="{DynamicResource RepositoryInformationGeometry}" Width="20" Height="20" />
+                                </Button>
+                        </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Grid.ColumnSpan="3" Background="{DynamicResource ShellHeaderBrush}" BorderBrush="{DynamicResource ShellSeparatorBrush}" BorderThickness="0,1,0,0" Padding="12,0">
+                        <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="12" Opacity="0.76" />
+                </Border>
+        </Grid>
 </Window>

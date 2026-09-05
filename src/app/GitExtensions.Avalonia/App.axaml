@@ -4,5 +4,30 @@
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="Button.rail-button">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Margin" Value="0,4" />
+        </Style>
+        <Style Selector="Button.chrome-button">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
     </Application.Styles>
+    <Application.Resources>
+        <SolidColorBrush x:Key="ShellInteriorBrush" Color="#30343A" />
+        <SolidColorBrush x:Key="ShellHeaderBrush" Color="#1C2025" />
+        <SolidColorBrush x:Key="ShellRailBrush" Color="#080A0D" />
+        <SolidColorBrush x:Key="ShellSeparatorBrush" Color="#B8C0CC" />
+        <StreamGeometry x:Key="WelcomeGeometry">M12,5.69 17,10.19 17,18 15,18 15,12 9,12 9,18 7,18 7,10.19 12,5.69 M12,3 2,12 5,12 5,20 11,20 11,14 13,14 13,20 19,20 19,12 22,12 12,3</StreamGeometry>
+        <StreamGeometry x:Key="OpenRepositoryGeometry">M19.5,20 4,20 C2.9,20 2,19.1 2,18 L2,6 C2,4.9 2.9,4 4,4 L10,4 12,6 20,6 C21.1,6 22,6.9 22,8 L20,18 19.5,20 M4,8 21.5,8 19.5,18 4,18 4,8</StreamGeometry>
+        <StreamGeometry x:Key="RepositoryInformationGeometry">M13,9 11,9 11,7 13,7 13,9 M13,17 11,17 11,11 13,11 13,17 M12,2 C6.48,2 2,6.48 2,12 2,17.52 6.48,22 12,22 17.52,22 22,17.52 22,12 22,6.48 17.52,2 12,2 M12,20 C7.58,20 4,16.42 4,12 4,7.58 7.58,4 12,4 16.42,4 20,7.58 20,12 20,16.42 16.42,20 12,20</StreamGeometry>
+        <StreamGeometry x:Key="MinimizeGeometry">M4,11 20,11 20,13 4,13 4,11</StreamGeometry>
+        <StreamGeometry x:Key="MaximizeGeometry">M4,4 20,4 20,20 4,20 4,4 M6,6 6,18 18,18 18,6 6,6</StreamGeometry>
+        <StreamGeometry x:Key="RestoreGeometry">M4,4 20,4 20,16 16,16 16,20 4,20 4,4 M6,6 6,18 14,18 14,14 18,14 18,6 6,6</StreamGeometry>
+        <StreamGeometry x:Key="CloseGeometry">M19,6.41 17.59,5 12,10.59 6.41,5 5,6.41 10.59,12 5,17.59 6.41,19 12,13.41 17.59,19 19,17.59 13.41,12 19,6.41</StreamGeometry>
+    </Application.Resources>
 </Application>
