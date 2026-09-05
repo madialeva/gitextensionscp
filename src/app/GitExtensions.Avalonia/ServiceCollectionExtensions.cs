@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using GitCommands;
 using GitCommands.Git;
+using GitExtensions.Avalonia.Localization;
 using GitExtensions.Avalonia.Services;
 using GitExtUtils;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,9 @@ internal static class ServiceCollectionExtensions
 
         services.AddSingleton<IFileSystem>(fileSystem);
         services.AddSingleton<IGitDirectoryResolver>(gitDirectoryResolver);
+        services.AddSingleton(_ => AvaloniaLocalizationService.FromAssembly(
+            typeof(AvaloniaLocalizationService).Assembly,
+            Environment.GetEnvironmentVariable(AvaloniaLocalizationService.CultureEnvironmentVariable)));
 
         services.AddGitCommands();
         services.AddSingleton<IRepositoryHistoryPort, ProductionRepositoryHistoryPort>();

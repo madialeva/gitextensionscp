@@ -1,15 +1,41 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GitCommands.UserRepositoryHistory;
+using GitExtensions.Avalonia.Localization;
 using GitExtensions.Avalonia.Services;
 
 namespace GitExtensions.Avalonia;
 
-internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService openingService) : ObservableObject
+internal sealed partial class RepositoryShellViewModel : ObservableObject
 {
+    private readonly AvaloniaLocalizationService _localization;
     private CancellationTokenSource? _openingCancellation;
     private string? _lastPath;
+
+    public RepositoryShellViewModel(RepositoryOpeningService openingService, AvaloniaLocalizationService localization)
+    {
+        ArgumentNullException.ThrowIfNull(openingService);
+        ArgumentNullException.ThrowIfNull(localization);
+
+        _openingService = openingService;
+        _localization = localization;
+        _localization.PropertyChanged += LocalizationPropertyChanged;
+        StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.NoRepositoryOpen);
+    }
+
+    private readonly RepositoryOpeningService _openingService;
+
+    public AvaloniaLocalizationService Localization => _localization;
+
+    public string BranchSummary => ActiveRepository is null
+        ? string.Empty
+        : $"{Localization.Resolve(AvaloniaLocalizationKeys.Branch)}: {ActiveRepository.Branch}";
+
+    public string RemotesSummary => ActiveRepository is null
+        ? string.Empty
+        : $"{Localization.Resolve(AvaloniaLocalizationKeys.Remotes)}: {ActiveRepository.RemoteSummary}";
 
     public ObservableCollection<Repository> RecentRepositories { get; } = [];
 
@@ -26,7 +52,7 @@ internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService 
     private bool _isWelcome = true;
 
     [ObservableProperty]
-    private string _statusMessage = "No repository open";
+    private string _statusMessage;
 
     public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
@@ -35,14 +61,37 @@ internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService 
     public async Task InitializeAsync()
     {
         RecentRepositories.Clear();
-        foreach (Repository repository in await openingService.LoadRecentHistoryAsync())
+        foreach (Repository repository in await _openingService.LoadRecentHistoryAsync())
         {
             RecentRepositories.Add(repository);
         }
     }
 
     partial void OnActiveRepositoryChanged(RepositoryPresentation? value)
-        => OnPropertyChanged(nameof(HasRepository));
+    {
+        OnPropertyChanged(nameof(HasRepository));
+        OnPropertyChanged(nameof(BranchSummary));
+        OnPropertyChanged(nameof(RemotesSummary));
+    }
+
+    private void LocalizationPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(BranchSummary));
+        OnPropertyChanged(nameof(RemotesSummary));
+
+        if (IsBusy)
+        {
+            StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.OpeningRepository);
+        }
+        else if (HasError)
+        {
+            StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.UnableToOpenRepository);
+        }
+        else if (ActiveRepository is null)
+        {
+            StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.NoRepositoryOpen);
+        }
+    }
 
     partial void OnErrorMessageChanged(string? value)
         => OnPropertyChanged(nameof(HasError));
@@ -68,7 +117,7 @@ internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService 
         ActiveRepository = null;
         IsWelcome = true;
         ErrorMessage = null;
-        StatusMessage = "No repository open";
+        StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.NoRepositoryOpen);
     }
 
     [RelayCommand]
@@ -86,7 +135,7 @@ internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService 
 
     private async Task OpenPickedFolderAsync()
     {
-        await OpenPathAsync(await openingService.PickFolderAsync(null, CancellationToken.None));
+        await OpenPathAsync(await _openingService.PickFolderAsync(null, CancellationToken.None));
     }
 
     private async Task OpenPathAsync(string? path)
@@ -107,22 +156,24 @@ internal sealed partial class RepositoryShellViewModel(RepositoryOpeningService 
         _lastPath = path;
         IsBusy = true;
         ErrorMessage = null;
-        StatusMessage = "Opening repository...";
+        StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.OpeningRepository);
 
         try
         {
-            ActiveRepository = await openingService.OpenAsync(path, cancellationToken);
+            ActiveRepository = await _openingService.OpenAsync(path, cancellationToken);
             IsWelcome = false;
             StatusMessage = ActiveRepository.Path;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            StatusMessage = ActiveRepository is null ? "No repository open" : ActiveRepository.Path;
+            StatusMessage = ActiveRepository is null
+                ? _localization.Resolve(AvaloniaLocalizationKeys.NoRepositoryOpen)
+                : ActiveRepository.Path;
         }
         catch (Exception exception)
         {
             ErrorMessage = exception.Message;
-            StatusMessage = "Unable to open repository";
+            StatusMessage = _localization.Resolve(AvaloniaLocalizationKeys.UnableToOpenRepository);
         }
         finally
         {

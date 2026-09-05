@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using GitCommands;
+using GitExtensions.Avalonia.Localization;
 using GitExtensions.Avalonia.Services;
 using GitExtUtils;
 using GitUI;
@@ -26,8 +27,11 @@ internal sealed class AvaloniaAppComposition
         return services.BuildServiceProvider();
     }
 
-    public void InstallPlatformDelegates()
+    public void InstallPlatformDelegates(IServiceProvider serviceProvider)
     {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        AvaloniaLocalizationService localization = serviceProvider.GetRequiredService<AvaloniaLocalizationService>();
+
         TaskManager.ExceptionReporter = exception =>
         {
             Window? mainWindow = _mainWindowProvider();
@@ -36,7 +40,7 @@ internal sealed class AvaloniaAppComposition
                 return;
             }
 
-            ExceptionDialog dialog = new(exception);
+            ExceptionDialog dialog = new(exception, localization);
             dialog.ShowDialog(mainWindow);
         };
 
@@ -48,7 +52,7 @@ internal sealed class AvaloniaAppComposition
                 return;
             }
 
-            ErrorDialog dialog = new(caption ?? "Error", text ?? "");
+            ErrorDialog dialog = new(caption ?? localization.Resolve(AvaloniaLocalizationKeys.Error), text ?? "", localization);
             dialog.ShowDialog(parent);
         };
 
@@ -70,7 +74,7 @@ internal sealed class AvaloniaAppComposition
                     await parent.StorageProvider.OpenFolderPickerAsync(
                         new FolderPickerOpenOptions
                         {
-                            Title = "Select folder",
+                            Title = localization.Resolve(AvaloniaLocalizationKeys.SelectFolder),
                             AllowMultiple = false,
                             SuggestedStartLocation = suggestedStart
                         });
