@@ -10,9 +10,10 @@ de JTF en el change 1.1b (`jtf-replumbing`) y con DI + delegates en el change 1.
 ## Requirements
 ### Requirement: Proyecto Avalonia en la solución
 El repositorio SHALL contener un proyecto `src/app/GitExtensions.Avalonia` que compile como
-`net10.0` con Avalonia 11.3, muestre una ventana vacia con tema Fluent, e inicialice
+`net10.0` con Avalonia 11.3, use el tema Fluent, inicialice
 `ThreadHelper.JoinableTaskContext` con `AvaloniaSynchronizationContext` en
-`OnFrameworkInitializationCompleted()`.
+`OnFrameworkInitializationCompleted()`, desactive las decoraciones nativas de la ventana y
+proporcione la ventana principal de la shell IDE-like y el flujo de apertura de repositorio.
 
 #### Scenario: El proyecto compila en Windows
 - **WHEN** se ejecuta `dotnet build` sobre `GitExtensions.Avalonia.csproj` en Windows
@@ -25,6 +26,12 @@ El repositorio SHALL contener un proyecto `src/app/GitExtensions.Avalonia` que c
 #### Scenario: El proyecto está en la solución
 - **WHEN** se abre `GitExtensions.slnx`
 - **THEN** `src/app/GitExtensions.Avalonia/GitExtensions.Avalonia.csproj` aparece listado
+
+#### Scenario: La shell principal reemplaza la ventana vacía
+- **WHEN** se inicia la aplicación Avalonia
+- **THEN** se muestra la composición principal con barra superior, rails laterales, área central y barra inferior
+- **AND** el área central puede alojar la vista de bienvenida o la vista del repositorio
+- **AND** la barra superior propia es el único chrome de ventana visible
 
 ### Requirement: Tema Fluent con claro/oscuro
 La aplicación SHALL usar `FluentTheme` como tema predeterminado, con soporte para variantes
