@@ -542,6 +542,7 @@ exclusiones anteriores son decisiones de alcance, no trabajo bloqueante de la sh
 | `make-avalonia-solution-primary` | 1.1d | 2026-08-26 | `GitExtensions.slnx` = solución cross-platform primaria; CI simétrico Win/Linux; test infra del core sin WinForms (`SingleThreadSynchronizationContext`) | `solution-structure`, `continuous-integration`, `local-verification`, `cross-platform-core` |
 | `extract-localizationhelpers-linux-verification` | 1.1e | 2026-08-29 | Cálculo portable de fechas, tests `net10.0` y verificación Linux con Bash | `cross-platform-core`, `local-verification`, `continuous-integration` |
 | `open-repository-main-shell` | 1.2 | 2026-09-05 | Shell Avalonia IDE-like, apertura de repositorios, información Git básica y tests headless | `avalonia-di`, `avalonia-shell`, `avalonia-main-shell`, `avalonia-repository-opening`, `avalonia-headless-testing` |
+| `migrate-avalonia-localization` | 1.1f | 2026-09-05 | Localización portable Avalonia con catálogos XLIFF embebidos, fallback, cultura observable y diálogos localizados | `avalonia-localization`, `avalonia-shell` |
 
 ### 10.10 Backlog derivado de los NO GOALS
 
@@ -550,7 +551,7 @@ pero sí merecen seguimiento en el milestone **Phase 1 Backlog**:
 
 | Issue | Motivo | Prioridad |
 |---|---|---|
-| [#22 Migrate localization infrastructure and decouple translated resources](https://github.com/madialeva/gitextensionscp/issues/22) | El change #19 dejó fuera la migración de la infraestructura completa de localización/XLIFF y el desacoplamiento de `TranslatedStrings` para la shell Avalonia | Media |
+| No hay nuevos seguimientos | Los NO GOALS restantes de este change ya están cubiertos por el alcance de Fase 4: localización completa, plugins, herramientas de traducción y empaquetado | — |
 
 El resto de los NO GOALS ya tiene fase asignada y no debe abrir issues de Fase 0/1: grafo y
 RevisionGrid (Fase 2), diff viewer (Fase 2), operaciones de escritura (Fase 3), localización
